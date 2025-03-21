@@ -9,49 +9,87 @@
         body { margin: 0; background: #000; color: #fff; font-family: Arial; text-align: center; padding: 20px; }
         .container { max-width: 800px; margin: 0 auto; }
         .channel-list { margin: 20px 0; }
-        .channel { padding: 10px; background: #333; margin: 5px; cursor: pointer; }
+        .channel { padding: 10px; background: #333; margin: 5px; cursor: pointer; position: relative; }
         .channel:hover { background: #555; }
-        .video-js { width: 100%; height: 400px; }
+        .preview { 
+            display: none; 
+            position: absolute; 
+            top: -220px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 300px; 
+            height: 200px; 
+            background: #000; 
+            border: 2px solid #fff; 
+            z-index: 10; 
+        }
+        .channel:hover .preview { display: block; }
+        .main-video { width: 100%; height: 400px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Min Streamingsida</h1>
         <div class="channel-list">
-            <div class="channel" onclick="playStream('https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8')">Zagros </div>
-            <div class="channel" onclick="playStream('https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8')">Zoom</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
-            <div class="channel" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">Testkanal 2</div>
+            <div class="channel" onmouseover="showPreview('https://live.zoomnews.info/live/Zoom_playlist.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
+               Zoom
+                <video-js id="preview1" class="preview" muted>
+                    <source src="" type="application/x-mpegURL">
+                </video-js>
+            </div>
+            <div class="channel" onmouseover="showPreview('https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8', 'preview2')" onmouseout="hidePreview('preview2')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
+                8
+                <video-js id="preview2" class="preview" muted>
+                    <source src="" type="application/x-mpegURL">
+                </video-js>
+            </div>
+            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview2')" onmouseout="hidePreview('preview2')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
+                Testkanal 2
+                <video-js id="preview2" class="preview" muted>
+                    <source src="" type="application/x-mpegURL">
+                </video-js>
+            </div>
+            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview2')" onmouseout="hidePreview('preview2')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
+                Testkanal 2
+                <video-js id="preview2" class="preview" muted>
+                    <source src="" type="application/x-mpegURL">
+                </video-js>
+            </div>
+            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview2')" onmouseout="hidePreview('preview2')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
+                Testkanal 2
+                <video-js id="preview2" class="preview" muted>
+                    <source src="" type="application/x-mpegURL">
+                </video-js>
+            </div>
             <!-- Lägg till fler kanaler här -->
         </div>
-        <video-js id="my-video" class="vjs-default-skin" controls autoplay>
+        <video-js id="main-video" class="vjs-default-skin main-video" controls autoplay>
             <source src="" type="application/x-mpegURL">
         </video-js>
     </div>
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
     <script>
-        var player = videojs('my-video');
-        function playStream(url) {
+        var mainPlayer = videojs('main-video');
+        var previewPlayers = {
+            'preview1': videojs('preview1'),
+            'preview2': videojs('preview2')
+            // Lägg till fler preview-ID:n här om du har fler kanaler
+        };
+
+        function showPreview(url, previewId) {
+            var player = previewPlayers[previewId];
             player.src({ src: url, type: 'application/x-mpegURL' });
             player.play();
+        }
+
+        function hidePreview(previewId) {
+            var player = previewPlayers[previewId];
+            player.pause();
+        }
+
+        function playStream(url) {
+            mainPlayer.src({ src: url, type: 'application/x-mpegURL' });
+            mainPlayer.play();
         }
     </script>
 </body>
