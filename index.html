@@ -53,48 +53,7 @@
     <div class="container">
         <h1>Min Streamingsida</h1>
         <button class="start-button" onclick="startPage()">Starta</button>
-        <div class="channel-list hidden" id="channelList">
-            <div class="channel" onmouseover="showPreview('https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8')">
-              Zagros
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://live.zoomnews.info/live/Zoom_playlist.m3u8', 'preview2')" onmouseout="hidePreview('preview2')" onclick="playStream('https://live.zoomnews.info/live/Zoom_playlist.m3u8')">
-                Zoom
-                <video-js id="preview2" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8', 'preview3')" onmouseout="hidePreview('preview1')" onclick="playStream('https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8')">
-                kanal8
-                <video-js id="preview3" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://aryen.tv/live/tv/playlist.m3u8', 'preview4')" onmouseout="hidePreview('preview4')" onclick="playStream('https://aryen.tv/live/tv/playlist.m3u8')">
-                Aryen
-                <video-js id="preview4" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://cira-tv.akamaized.net/hls/stream_0.m3u8', 'preview5')" onmouseout="hidePreview('preview5')" onclick="playStream('https://cira-tv.akamaized.net/hls/stream_0.m3u8')">
-                Cira
-                <video-js id="preview5" class="preview">
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview" muted>
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview2')" onmouseout="hidePreview('preview2')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 2
-                <video-js id="preview2" class="preview" muted>
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <!-- Lägg till fler kanaler här -->
-        </div>
+        <div class="channel-list hidden" id="channelList"></div>
         <video-js id="main-video" class="vjs-default-skin main-video" controls autoplay>
             <source src="" type="application/x-mpegURL">
         </video-js>
@@ -102,25 +61,69 @@
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
     <script>
         var mainPlayer = videojs('main-video');
-        var previewPlayers = {
-            'preview1': videojs('preview1'),
-            'preview2': videojs('preview2')
-            // Lägg till fler preview-ID:n här om du har fler kanaler
-        };
+        var previewPlayers = {};
         var isStarted = false;
+
+        // Lista med alla kanaler
+        var channels = [
+            { name: "Zagros", url: "https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8" },
+            { name: "Zoom", url: "https://live.zoomnews.info/live/Zoom_playlist.m3u8" },
+            { name: "kanal8", url: "https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8" },
+            { name: "Aryen", url: "https://aryen.tv/live/tv/playlist.m3u8" },
+            { name: "Cira", url: "https://cira-tv.akamaized.net/hls/stream_0.m3u8" },
+            { name: "Med music", url: "https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8" },
+            { name: "4 Kurd", url: "https://4kuhls.persiana.live/hls/stream.m3u8" },
+            { name: "Zarok", url: "https://zindisorani.zaroktv.com.tr/hls/stream.m3u8" },
+            { name: "Waar", url: "https://ca-rt.onetv.app/Waar/index-0.m3u8" },
+            { name: "Rudaw", url: "https://svs.itworkscdn.net/rudawlive/rudawlive.smil/playlist.m3u8" },
+            { name: "Rojava", url: "https://rojava-tv.akamaized.net/hls/rojava-tv.m3u8" },
+            { name: "Payam", url: "https://media2.streambrothers.com:1936/8218/8218/playlist.m3u8" },
+            { name: "NRTHD", url: "https://media.streambrothers.com:1936/8226/8226/playlist.m3u8" },
+            { name: "Kurdsat News", url: "https://kurdsat-news.akamaized.net/hls/kurdsat-news.m3u8" },
+            { name: "Kurdsat HD", url: "https://kurdsat.akamaized.net/hls/kurdsat.m3u8" },
+            { name: "Kurdistan TV", url: "https://5a3ed7a72ed4b.streamlock.net/live/SMIL:myStream.smil/playlist.m3u8" },
+            { name: "Kurdistan24", url: "https://d1x82nydcxndze.cloudfront.net/live/index_720p25.m3u8" },
+            { name: "PDKI", url: "https://kurd-channel.ikoflix.com/hls/stream_2.m3u8" },
+            { name: "Komala", url: "https://live.tvkomala.com/live/komala/playlist.m3u8" },
+            { name: "GK", url: "https://live.host247.net/gk/gksat/playlist.m3u8" },
+            { name: "IRIB Kurdistan", url: "https://lenz.splus.ir/PLTV/88888888/224/3221226647/index.m3u8" },
+            { name: "Mahabad", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
+            { name: "TRT Kurdi", url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8" },
+            { name: "Speda", url: "https://spedanet.store/upload/images/spedahd.m3u8" }
+        ];
+
+        // Generera kanalerna dynamiskt
+        function generateChannels() {
+            var channelList = document.getElementById('channelList');
+            channels.forEach(function(channel, index) {
+                var previewId = 'preview' + (index + 1);
+                var channelDiv = document.createElement('div');
+                channelDiv.className = 'channel';
+                channelDiv.innerHTML = `
+                    ${channel.name}
+                    <video-js id="${previewId}" class="preview" muted>
+                        <source src="" type="application/x-mpegURL">
+                    </video-js>
+                `;
+                channelDiv.onmouseover = function() { showPreview(channel.url, previewId); };
+                channelDiv.onmouseout = function() { hidePreview(previewId); };
+                channelDiv.onclick = function() { playStream(channel.url); };
+                channelList.appendChild(channelDiv);
+                previewPlayers[previewId] = videojs(previewId);
+            });
+        }
 
         function startPage() {
             isStarted = true;
             document.getElementById('channelList').classList.remove('hidden');
             document.querySelector('.start-button').style.display = 'none';
-            // Efter interaktion, ta bort muted från förhandsvisningar
             Object.keys(previewPlayers).forEach(function(previewId) {
                 previewPlayers[previewId].muted(false);
             });
         }
 
         function showPreview(url, previewId) {
-            if (!isStarted) return; // Gör inget innan användaren har klickat på Starta
+            if (!isStarted) return;
             var player = previewPlayers[previewId];
             player.src({ src: url, type: 'application/x-mpegURL' });
             player.play();
@@ -135,6 +138,9 @@
             mainPlayer.src({ src: url, type: 'application/x-mpegURL' });
             mainPlayer.play();
         }
+
+        // Kör funktionen för att generera kanalerna när sidan laddas
+        generateChannels();
     </script>
 </body>
 </html>
