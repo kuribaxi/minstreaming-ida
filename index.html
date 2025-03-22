@@ -6,54 +6,92 @@
     <title>Min Streamingsida</title>
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <style>
-        body { margin: 0; background: #000; color: #fff; font-family: Arial; text-align: center; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        body { 
+            margin: 0; 
+            background: #1a1a1a; 
+            color: #fff; 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        h1 { 
+            text-align: center; 
+            font-size: 2em; 
+            margin-bottom: 20px; 
+            color: #e50914; 
+        }
+        .category { 
+            margin-bottom: 30px; 
+        }
+        .category h2 { 
+            font-size: 1.5em; 
+            margin-bottom: 10px; 
+            border-bottom: 2px solid #e50914; 
+            display: inline-block; 
+        }
         .channel-list { 
-            margin: 20px 0; 
             display: flex; 
             flex-wrap: wrap; 
-            justify-content: center; 
+            gap: 10px; 
         }
         .channel { 
-            padding: 10px; 
             background: #333; 
-            margin: 5px; 
-            cursor: pointer; 
-            position: relative; 
-            width: 100px; 
+            padding: 10px; 
+            width: 120px; 
             text-align: center; 
+            cursor: pointer; 
+            border-radius: 5px; 
+            transition: background 0.3s; 
         }
-        .channel:hover { background: #555; }
-        .preview { 
-            display: none; 
-            position: absolute; 
-            top: 40px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            width: 200px; 
-            height: 150px; 
-            background: #000; 
-            border: 2px solid #fff; 
-            z-index: 10; 
+        .channel:hover { 
+            background: #e50914; 
         }
-        .channel:hover .preview { display: block; }
-        .main-video { width: 100%; height: 400px; }
+        .main-video { 
+            width: 100%; 
+            max-width: 800px; 
+            height: 450px; 
+            margin: 20px auto; 
+        }
         .start-button { 
+            display: block; 
+            margin: 20px auto; 
             padding: 10px 20px; 
             background: #e50914; 
             border: none; 
             color: #fff; 
             cursor: pointer; 
-            margin: 10px 0; 
+            font-size: 1em; 
         }
-        .hidden { display: none; }
+        .hidden { 
+            display: none; 
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Min Streamingsida</h1>
         <button class="start-button" onclick="startPage()">Starta</button>
-        <div class="channel-list hidden" id="channelList"></div>
+        <div id="categories" class="hidden">
+            <div class="category">
+                <h2>Nyheter</h2>
+                <div class="channel-list" id="newsChannels"></div>
+            </div>
+            <div class="category">
+                <h2>Musik</h2>
+                <div class="channel-list" id="musicChannels"></div>
+            </div>
+            <div class="category">
+                <h2>Underhållning</h2>
+                <div class="channel-list" id="entertainmentChannels"></div>
+            </div>
+            <div class="category">
+                <h2>Barn</h2>
+                <div class="channel-list" id="kidsChannels"></div>
+            </div>
+        </div>
         <video-js id="main-video" class="vjs-default-skin main-video" controls autoplay>
             <source src="" type="application/x-mpegURL">
         </video-js>
@@ -61,77 +99,96 @@
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
     <script>
         var mainPlayer = videojs('main-video');
-        var previewPlayers = {};
         var isStarted = false;
 
-        // Lista med alla kanaler
-        var channels = [
-            { name: "Zagros", url: "https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8" },
-            { name: "Zoom", url: "https://live.zoomnews.info/live/Zoom_playlist.m3u8" },
-            { name: "kanal8", url: "https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8" },
-            { name: "Aryen", url: "https://aryen.tv/live/tv/playlist.m3u8" },
-            { name: "Cira", url: "https://cira-tv.akamaized.net/hls/stream_0.m3u8" },
-            { name: "Med music", url: "https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8" },
-            { name: "4 Kurd", url: "https://4kuhls.persiana.live/hls/stream.m3u8" },
-            { name: "Zarok", url: "https://zindisorani.zaroktv.com.tr/hls/stream.m3u8" },
-            { name: "Waar", url: "https://ca-rt.onetv.app/Waar/index-0.m3u8" },
-            { name: "Rudaw", url: "https://svs.itworkscdn.net/rudawlive/rudawlive.smil/playlist.m3u8" },
-            { name: "Rojava", url: "https://rojava-tv.akamaized.net/hls/rojava-tv.m3u8" },
-            { name: "Payam", url: "https://media2.streambrothers.com:1936/8218/8218/playlist.m3u8" },
-            { name: "NRTHD", url: "https://media.streambrothers.com:1936/8226/8226/playlist.m3u8" },
-            { name: "Kurdsat News", url: "https://kurdsat-news.akamaized.net/hls/kurdsat-news.m3u8" },
-            { name: "Kurdsat HD", url: "https://kurdsat.akamaized.net/hls/kurdsat.m3u8" },
-            { name: "Kurdistan TV", url: "https://5a3ed7a72ed4b.streamlock.net/live/SMIL:myStream.smil/playlist.m3u8" },
-            { name: "Kurdistan24", url: "https://d1x82nydcxndze.cloudfront.net/live/index_720p25.m3u8" },
-            { name: "PDKI", url: "https://kurd-channel.ikoflix.com/hls/stream_2.m3u8" },
-            { name: "Komala", url: "https://live.tvkomala.com/live/komala/playlist.m3u8" },
-            { name: "GK", url: "https://live.host247.net/gk/gksat/playlist.m3u8" },
-            { name: "IRIB Kurdistan", url: "https://lenz.splus.ir/PLTV/88888888/224/3221226647/index.m3u8" },
-            { name: "Mahabad", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
-            { name: "TRT Kurdi", url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8" },
-            { name: "Speda", url: "https://spedanet.store/upload/images/spedahd.m3u8" }
-        ];
+        // Lista med alla kanaler, uppdelade i kategorier
+        var channels = {
+            news: [
+                { name: "Zagros", url: "https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8" },
+                { name: "Zoom", url: "https://live.zoomnews.info/live/Zoom_playlist.m3u8" },
+                { name: "kanal8", url: "https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8" },
+                { name: "Rudaw", url: "https://svs.itworkscdn.net/rudawlive/rudawlive.smil/playlist.m3u8" },
+                { name: "Kurdsat News", url: "https://kurdsat-news.akamaized.net/hls/kurdsat-news.m3u8" },
+                { name: "Kurdistan24", url: "https://d1x82nydcxndze.cloudfront.net/live/index_720p25.m3u8" }
+            ],
+            music: [
+                { name: "Med music", url: "https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8" },
+                { name: "4 Kurd", url: "https://4kuhls.persiana.live/hls/stream.m3u8" }
+            ],
+            entertainment: [
+                { name: "Aryen", url: "https://aryen.tv/live/tv/playlist.m3u8" },
+                { name: "Cira", url: "https://cira-tv.akamaized.net/hls/stream_0.m3u8" },
+                { name: "Waar", url: "https://ca-rt.onetv.app/Waar/index-0.m3u8" },
+                { name: "Rojava", url: "https://rojava-tv.akamaized.net/hls/rojava-tv.m3u8" },
+                { name: "Payam", url: "https://media2.streambrothers.com:1936/8218/8218/playlist.m3u8" },
+                { name: "NRTHD", url: "https://media.streambrothers.com:1936/8226/8226/playlist.m3u8" },
+                { name: "Kurdsat HD", url: "https://kurdsat.akamaized.net/hls/kurdsat.m3u8" },
+                { name: "Kurdistan TV", url: "https://5a3ed7a72ed4b.streamlock.net/live/SMIL:myStream.smil/playlist.m3u8" },
+                { name: "PDKI", url: "https://kurd-channel.ikoflix.com/hls/stream_2.m3u8" },
+                { name: "Komala", url: "https://live.tvkomala.com/live/komala/playlist.m3u8" },
+                { name: "GK", url: "https://live.host247.net/gk/gksat/playlist.m3u8" },
+                { name: "IRIB Kurdistan", url: "https://lenz.splus.ir/PLTV/88888888/224/3221226647/index.m3u8" },
+                { name: "Mahabad", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
+                { name: "TRT Kurdi", url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8" },
+                { name: "Speda", url: "https://spedanet.store/upload/images/spedahd.m3u8" },
+                { name: "Sahar", url: "https://lb-cdn.sepehrtv.ir/securelive3/saharkurdsd/saharkurdsd.m3u8?s=hLLGvDXeJTm62fElbGiWIA&t=1742663271" },
+                { name: "Ava TV", url: "https://ava2.site/upload/ava.m3u8" },
+                { name: "Mahabad TV", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
+                { name: "Shar TV", url: "http://avrstream.com:1935/live/SHARTV/chunklist_w2095841563.m3u8" }
+            ],
+            kids: [
+                { name: "Zarok", url: "https://zindisorani.zaroktv.com.tr/hls/stream.m3u8" }
+            ]
+        };
 
-        // Generera kanalerna dynamiskt
+        // Generera kanalerna dynamiskt för varje kategori
         function generateChannels() {
-            var channelList = document.getElementById('channelList');
-            channels.forEach(function(channel, index) {
-                var previewId = 'preview' + (index + 1);
+            var newsList = document.getElementById('newsChannels');
+            var musicList = document.getElementById('musicChannels');
+            var entertainmentList = document.getElementById('entertainmentChannels');
+            var kidsList = document.getElementById('kidsChannels');
+
+            // Nyheter
+            channels.news.forEach(function(channel) {
                 var channelDiv = document.createElement('div');
                 channelDiv.className = 'channel';
-                channelDiv.innerHTML = `
-                    ${channel.name}
-                    <video-js id="${previewId}" class="preview" muted>
-                        <source src="" type="application/x-mpegURL">
-                    </video-js>
-                `;
-                channelDiv.onmouseover = function() { showPreview(channel.url, previewId); };
-                channelDiv.onmouseout = function() { hidePreview(previewId); };
+                channelDiv.textContent = channel.name;
                 channelDiv.onclick = function() { playStream(channel.url); };
-                channelList.appendChild(channelDiv);
-                previewPlayers[previewId] = videojs(previewId);
+                newsList.appendChild(channelDiv);
+            });
+
+            // Musik
+            channels.music.forEach(function(channel) {
+                var channelDiv = document.createElement('div');
+                channelDiv.className = 'channel';
+                channelDiv.textContent = channel.name;
+                channelDiv.onclick = function() { playStream(channel.url); };
+                musicList.appendChild(channelDiv);
+            });
+
+            // Underhållning
+            channels.entertainment.forEach(function(channel) {
+                var channelDiv = document.createElement('div');
+                channelDiv.className = 'channel';
+                channelDiv.textContent = channel.name;
+                channelDiv.onclick = function() { playStream(channel.url); };
+                entertainmentList.appendChild(channelDiv);
+            });
+
+            // Barn
+            channels.kids.forEach(function(channel) {
+                var channelDiv = document.createElement('div');
+                channelDiv.className = 'channel';
+                channelDiv.textContent = channel.name;
+                channelDiv.onclick = function() { playStream(channel.url); };
+                kidsList.appendChild(channelDiv);
             });
         }
 
         function startPage() {
             isStarted = true;
-            document.getElementById('channelList').classList.remove('hidden');
+            document.getElementById('categories').classList.remove('hidden');
             document.querySelector('.start-button').style.display = 'none';
-            Object.keys(previewPlayers).forEach(function(previewId) {
-                previewPlayers[previewId].muted(false);
-            });
-        }
-
-        function showPreview(url, previewId) {
-            if (!isStarted) return;
-            var player = previewPlayers[previewId];
-            player.src({ src: url, type: 'application/x-mpegURL' });
-            player.play();
-        }
-
-        function hidePreview(previewId) {
-            var player = previewPlayers[previewId];
-            player.pause();
         }
 
         function playStream(url) {
