@@ -38,12 +38,22 @@
         }
         .channel:hover .preview { display: block; }
         .main-video { width: 100%; height: 400px; }
+        .start-button { 
+            padding: 10px 20px; 
+            background: #e50914; 
+            border: none; 
+            color: #fff; 
+            cursor: pointer; 
+            margin: 10px 0; 
+        }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Min Streamingsida</h1>
-        <div class="channel-list">
+        <button class="start-button" onclick="startPage()">Starta</button>
+        <div class="channel-list hidden" id="channelList">
             <div class="channel" onmouseover="showPreview('https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
               Zagros
                 <video-js id="preview1" class="preview">
@@ -71,132 +81,15 @@
             <div class="channel" onmouseover="showPreview('https://cira-tv.akamaized.net/hls/stream_0.m3u8', 'preview5')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
                 Cira
                 <video-js id="preview5" class="preview">
+            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
+                Testkanal 1
+                <video-js id="preview1" class="preview" muted>
                     <source src="" type="application/x-mpegURL">
                 </video-js>
             </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
-                    <source src="" type="application/x-mpegURL">
-                </video-js>
-            </div>
-            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-                Testkanal 1
-                <video-js id="preview1" class="preview">
+            <div class="channel" onmouseover="showPreview('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', 'preview2')" onmouseout="hidePreview('preview2')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
+                Testkanal 2
+                <video-js id="preview2" class="preview" muted>
                     <source src="" type="application/x-mpegURL">
                 </video-js>
             </div>
@@ -214,8 +107,20 @@
             'preview2': videojs('preview2')
             // Lägg till fler preview-ID:n här om du har fler kanaler
         };
+        var isStarted = false;
+
+        function startPage() {
+            isStarted = true;
+            document.getElementById('channelList').classList.remove('hidden');
+            document.querySelector('.start-button').style.display = 'none';
+            // Efter interaktion, ta bort muted från förhandsvisningar
+            Object.keys(previewPlayers).forEach(function(previewId) {
+                previewPlayers[previewId].muted(false);
+            });
+        }
 
         function showPreview(url, previewId) {
+            if (!isStarted) return; // Gör inget innan användaren har klickat på Starta
             var player = previewPlayers[previewId];
             player.src({ src: url, type: 'application/x-mpegURL' });
             player.play();
