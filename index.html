@@ -7,18 +7,31 @@
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <style>
         body { margin: 0; background: #000; color: #fff; font-family: Arial; text-align: center; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .channel-list { margin: 20px 0; }
-        .channel { padding: 10px; background: #333; margin: 5px; cursor: pointer; position: relative; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .channel-list { 
+            margin: 20px 0; 
+            display: flex; /* Gör så att kanalerna visas i en rad */
+            flex-wrap: wrap; /* Om det inte finns plats, går de till nästa rad */
+            justify-content: center; /* Centrera kanalerna */
+        }
+        .channel { 
+            padding: 10px; 
+            background: #333; 
+            margin: 5px; 
+            cursor: pointer; 
+            position: relative; 
+            width: 100px; /* Begränsar bredden på varje kanal */
+            text-align: center; /* Centrerar texten */
+        }
         .channel:hover { background: #555; }
         .preview { 
             display: none; 
             position: absolute; 
-            top: 40px; /* Flyttar fönstret NEDANFÖR kanalnamnet */
+            top: 40px; /* Fönstret visas nedanför */
             left: 50%; 
             transform: translateX(-50%); 
-            width: 300px; 
-            height: 200px; 
+            width: 200px; /* Minskar storleken på förhandsvisningen */
+            height: 150px; 
             background: #000; 
             border: 2px solid #fff; 
             z-index: 10; 
@@ -32,7 +45,7 @@
         <h1>Min Streamingsida</h1>
         <div class="channel-list">
             <div class="channel" onmouseover="showPreview('https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8', 'preview1')" onmouseout="hidePreview('preview1')" onclick="playStream('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
-              kanal8
+               kanal8
                 <video-js id="preview1" class="preview" muted>
                     <source src="" type="application/x-mpegURL">
                 </video-js>
