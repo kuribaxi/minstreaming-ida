@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -55,26 +56,12 @@
             height: 450px; 
             margin: 20px auto; 
         }
-        .start-button { 
-            display: block; 
-            margin: 20px auto; 
-            padding: 10px 20px; 
-            background: #e50914; 
-            border: none; 
-            color: #fff; 
-            cursor: pointer; 
-            font-size: 1em; 
-        }
-        .hidden { 
-            display: none; 
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Min Streamingsida</h1>
-        <button class="start-button" onclick="startPage()">Starta</button>
-        <div id="categories" class="hidden">
+        <div id="categories">
             <div class="category">
                 <h2>Nyheter</h2>
                 <div class="channel-list" id="newsChannels"></div>
@@ -99,7 +86,6 @@
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
     <script>
         var mainPlayer = videojs('main-video');
-        var isStarted = false;
 
         // Lista med alla kanaler, uppdelade i kategorier
         var channels = {
@@ -203,22 +189,6 @@
                 console.log("Spelar upp ström: " + channel.url);
                 playStream(channel.url);
             }
-        }
-
-        function startPage() {
-            console.log("startPage körs..."); // Felsökningslogg
-            isStarted = true;
-            var categoriesElement = document.getElementById('categories');
-            var startButton = document.querySelector('.start-button');
-
-            if (!categoriesElement || !startButton) {
-                console.error("Kunde inte hitta categoriesElement eller startButton");
-                return;
-            }
-
-            categoriesElement.classList.remove('hidden');
-            startButton.style.display = 'none';
-            console.log("Kanallistan visas nu."); // Felsökningslogg
         }
 
         function playStream(url) {
