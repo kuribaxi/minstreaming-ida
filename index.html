@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
@@ -117,8 +117,8 @@
                 { name: "IRIB Kurdistan", url: "https://lenz.splus.ir/PLTV/88888888/224/3221226647/index.m3u8" },
                 { name: "Mahabad", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
                 { name: "TRT Kurdi", url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8" },
-                { name: "Speda", url: "https://5a3ed7a72ed4b.streamlock.net/spedatv/SMIL:speda.smil/playlist.m3u8" },
-                { name: "Sahar", url: "https://kurdish.sahartv.ir/live", redirect: true, newTab: true },
+                { name: "Speda", url: "https://www.speda.net/tv1/", openInPopup: true }, // Öppnas i popup-fönster
+                { name: "Sahar", url: "https://kurdish.sahartv.ir/live", openInPopup: true }, // Öppnas i popup-fönster
                 { name: "Ava TV", url: "https://ava2.site/upload/ava.m3u8" },
                 { name: "Shar TV", url: "http://avrstream.com:1935/live/SHARTV/chunklist_w2095841563.m3u8" },
                 { name: "Ronahi", url: "https://ronahi-tv.akamaized.net/hls/stream_0.m3u8" },
@@ -188,10 +188,14 @@
         // Hantera klick på en kanal
         function handleChannelClick(channel) {
             console.log("Klickade på kanal: " + channel.name);
-            // Dölj videospelaren som standard
+            // Dölj videospelaren om vi inte använder den
             mainVideo.style.display = 'none';
 
-            if (channel.redirect) {
+            if (channel.openInPopup) {
+                console.log("Öppnar i popup-fönster: " + channel.url);
+                // Öppna ett popup-fönster med specificerade dimensioner
+                window.open(channel.url, channel.name + "Popup", "width=800,height=450,top=100,left=100,toolbar=no,menubar=no,scrollbars=no,resizable=yes");
+            } else if (channel.redirect) {
                 console.log("Omdirigerar till: " + channel.url);
                 if (channel.newTab) {
                     window.open(channel.url, '_blank');
