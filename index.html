@@ -58,9 +58,14 @@
         .iframe-container { 
             width: 100%; 
             max-width: 800px; 
-            height: 450px; 
+            height: 600px; /* Ökad höjd för att visa mer av Sahars sida */
             margin: 20px auto; 
             display: none; 
+        }
+        .iframe-container iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
@@ -89,7 +94,7 @@
             <source src="" type="application/x-mpegURL">
         </video-js>
         <div id="iframe-container" class="iframe-container">
-            <iframe id="sahar-iframe" src="" height="450px" width="100%" style="border:0px #FFFFFF none;" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no"></iframe>
+            <iframe id="sahar-iframe" src="" height="600px" width="100%" style="border:0px #FFFFFF none;" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" allow="fullscreen"></iframe>
         </div>
     </div>
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
@@ -130,7 +135,7 @@
                 { name: "Mahabad", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
                 { name: "TRT Kurdi", url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8" },
                 { name: "Speda", url: "https://www.speda.net/tv1/", redirect: true, newTab: true },
-                { name: "Sahar", url: "https://kurdish.sahartv.ir/live", isIframe: true }, // Uppdaterad URL till officiella live-sidan
+                { name: "Sahar", url: "https://kurdish.sahartv.ir/live", isIframe: true },
                 { name: "Ava TV", url: "https://ava2.site/upload/ava.m3u8" },
                 { name: "Shar TV", url: "http://avrstream.com:1935/live/SHARTV/chunklist_w2095841563.m3u8" },
                 { name: "Ronahi", url: "https://ronahi-tv.akamaized.net/hls/stream_0.m3u8" },
