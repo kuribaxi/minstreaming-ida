@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
@@ -55,6 +55,13 @@
             height: 450px; 
             margin: 20px auto; 
         }
+        .iframe-container { 
+            width: 100%; 
+            max-width: 800px; 
+            height: 450px; 
+            margin: 20px auto; 
+            display: none; 
+        }
     </style>
 </head>
 <body>
@@ -81,10 +88,15 @@
         <video-js id="main-video" class="vjs-default-skin main-video" controls autoplay>
             <source src="" type="application/x-mpegURL">
         </video-js>
+        <div id="iframe-container" class="iframe-container">
+            <iframe id="channel-iframe" src="" height="450px" width="100%" style="border:0px #FFFFFF none;" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no"></iframe>
+        </div>
     </div>
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
     <script>
         var mainPlayer = videojs('main-video');
+        var iframeContainer = document.getElementById('iframe-container');
+        var channelIframe = document.getElementById('channel-iframe');
         var mainVideo = document.getElementById('main-video');
 
         // Lista med alla kanaler, uppdelade i kategorier
@@ -117,8 +129,8 @@
                 { name: "IRIB Kurdistan", url: "https://lenz.splus.ir/PLTV/88888888/224/3221226647/index.m3u8" },
                 { name: "Mahabad", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
                 { name: "TRT Kurdi", url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8" },
-                { name: "Speda", url: "https://www.speda.net/tv1/", openInPopup: true }, // Öppnas i popup-fönster
-                { name: "Sahar", url: "https://kurdish.sahartv.ir/live", openInPopup: true }, // Öppnas i popup-fönster
+                { name: "Speda", url: "https://www.speda.net/tv1/", isIframe: true }, // Inbäddas med iframe
+                { name: "Sahar", url: "https://kurdish.sahartv.ir/live", isIframe: true }, // Inbäddas med iframe
                 { name: "Ava TV", url: "https://ava2.site/upload/ava.m3u8" },
                 { name: "Shar TV", url: "http://avrstream.com:1935/live/SHARTV/chunklist_w2095841563.m3u8" },
                 { name: "Ronahi", url: "https://ronahi-tv.akamaized.net/hls/stream_0.m3u8" },
@@ -188,13 +200,14 @@
         // Hantera klick på en kanal
         function handleChannelClick(channel) {
             console.log("Klickade på kanal: " + channel.name);
-            // Dölj videospelaren om vi inte använder den
+            // Dölj båda spelarna som standard
             mainVideo.style.display = 'none';
+            iframeContainer.style.display = 'none';
 
-            if (channel.openInPopup) {
-                console.log("Öppnar i popup-fönster: " + channel.url);
-                // Öppna ett popup-fönster med specificerade dimensioner
-                window.open(channel.url, channel.name + "Popup", "width=800,height=450,top=100,left=100,toolbar=no,menubar=no,scrollbars=no,resizable=yes");
+            if (channel.isIframe) {
+                console.log("Visar iframe för: " + channel.url);
+                channelIframe.src = channel.url; // Sätt iframe-URL:en
+                iframeContainer.style.display = 'block'; // Visa iframe-containern
             } else if (channel.redirect) {
                 console.log("Omdirigerar till: " + channel.url);
                 if (channel.newTab) {
