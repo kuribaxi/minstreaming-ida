@@ -49,11 +49,10 @@
         .channel:hover { 
             background: #e50914; 
         }
-        .main-video { 
-            width: 100%; 
-            max-width: 800px; 
-            height: 450px; 
-            margin: 20px auto; 
+        .video-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
         }
         .iframe-container { 
             width: 100%; 
@@ -85,160 +84,156 @@
                 <div class="channel-list" id="kidsChannels"></div>
             </div>
         </div>
-        <video-js id="main-video" class="vjs-default-skin main-video" controls autoplay>
-            <source src="" type="application/x-mpegURL">
-        </video-js>
+        <div class="video-container">
+            <video id="main-video" class="video-js vjs-default-skin" controls autoplay width="100%" height="450">
+                <source src="" type="application/x-mpegURL">
+            </video>
+        </div>
         <div id="iframe-container" class="iframe-container">
-            <iframe id="channel-iframe" src="" height="450px" width="100%" style="border:0px #FFFFFF none;" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no"></iframe>
+            <iframe id="channel-iframe" src="" height="450" width="100%" style="border:0px #FFFFFF none;" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no"></iframe>
         </div>
     </div>
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
     <script>
-        var mainPlayer = videojs('main-video');
-        var iframeContainer = document.getElementById('iframe-container');
-        var channelIframe = document.getElementById('channel-iframe');
-        var mainVideo = document.getElementById('main-video');
-
-        // Lista med alla kanaler, uppdelade i kategorier
-        var channels = {
-            news: [
-                { name: "Zagros", url: "https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8" },
-                { name: "Zoom", url: "https://live.zoomnews.info/live/Zoom_playlist.m3u8" },
-                { name: "kanal8", url: "https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8" },
-                { name: "Rudaw", url: "https://svs.itworkscdn.net/rudawlive/rudawlive.smil/playlist.m3u8" },
-                { name: "Kurdsat News", url: "https://kurdsat-news.akamaized.net/hls/kurdsat-news.m3u8" },
-                { name: "Kurdistan24", url: "https://d1x82nydcxndze.cloudfront.net/live/index_720p25.m3u8" },
-                { name: "Sterk", url: "https://muzkurd.com/sterktv/sterk/chunklist_w913361557.m3u8" },
-                { name: "NRT News", url: "https://media.streambrothers.com:1936/8226/8226/playlist.m3u8" }
-            ],
-            music: [
-                { name: "Med music", url: "http://54.36.110.140/live3/live3.m3u8" },
-                { name: "4 Kurd", url: "https://4kuhls.persiana.live/hls/stream.m3u8" }
-            ],
-            entertainment: [
-                { name: "Aryen", url: "https://aryen.tv/live/tv/playlist.m3u8" },
-                { name: "Cira", url: "https://cira-tv.akamaized.net/hls/stream_0.m3u8" },
-                { name: "Waar", url: "https://live.kwikmotion.com/waarmedialive/waarmedia.smil/waarmediapublish/waarmedia_source/chunks.m3u8" },
-                { name: "Rojava", url: "https://rojava-tv.akamaized.net/hls/rojava-tv.m3u8" },
-                { name: "Payam", url: "https://media2.streambrothers.com:1936/8218/8218/playlist.m3u8" },
-                { name: "Kurdsat HD", url: "https://kurdsat.akamaized.net/hls/kurdsat.m3u8" },
-                { name: "Kurdistan TV", url: "https://5a3ed7a72ed4b.streamlock.net/live/SMIL:myStream.smil/playlist.m3u8" },
-                { name: "PDKI", url: "https://iko-live.akamaized.net/kurdhd/master.m3u8" },
-                { name: "Komala", url: "https://live.tvkomala.com/live/komala/playlist.m3u8" },
-                { name: "GK", url: "https://live.host247.net/gk/gksat/playlist.m3u8" },
-                { name: "IRIB Kurdistan", url: "https://lenz.splus.ir/PLTV/88888888/224/3221226647/index.m3u8" },
-                { name: "Mahabad", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
-                { name: "TRT Kurdi", url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8" },
-                { name: "Speda", url: "https://www.speda.net/tv1/", redirect: true, newTab: true },
-                { name: "Sahar", url: "https://kurdish.sahartv.ir/live", isIframe: true },
-                { name: "Ava TV", url: "https://ava2.site/upload/ava.m3u8" },
-                { name: "Shar TV", url: "http://avrstream.com:1935/live/SHARTV/chunklist_w2095841563.m3u8" },
-                { name: "Ronahi", url: "https://ronahi-tv.akamaized.net/hls/stream_0.m3u8" },
-                { name: "Amozhgary", url: "https://app-live.org/live/3268334b/index.m3u8" },
-                { name: "Sada", url: "https://sadatv.icdndhcp.com/live/sadatv/playlist.m3u8" },
-                { name: "UTV Hawler", url: "https://utvhawler.net/index.htm", redirect: true, newTab: true },
-                { name: "ALA", url: "https://karwan.tv/ala-tv.html", redirect: true, newTab: true },
-                { name: "ANIMAL", url: "https://karwan.tv/animal-box.html", redirect: true, newTab: true },
-                { name: "AVAR", url: "https://karwan.tv/avar-tv.html", redirect: true, newTab: true },
-                { name: "Kirkuk TV", url: "https://live.kirkuklive.live/hls/stream/index.m3u8" }
-            ],
-            kids: [
-                { name: "Baxche", url: "https://5dcabf026b188.streamlock.net/afarinTV/livestream/playlist.m3u8" },
-                { name: "Afarin Kids", url: "https://65f16f0fdfc51.streamlock.net/afarinTV/livestream/playlist.m3u8" },
-                { name: "Zarok Kurmanci", url: "https://zindikurmanci.zaroktv.com.tr/hls/0/stream.m3u8" },
-                { name: "Zarok Sorani", url: "https://zindisorani.zaroktv.com.tr/hls/stream.m3u8" }
-            ]
-        };
-
-        // Generera kanalerna dynamiskt för varje kategori
-        function generateChannels() {
-            console.log("Genererar kanaler...");
-            var newsList = document.getElementById('newsChannels');
-            var musicList = document.getElementById('musicChannels');
-            var entertainmentList = document.getElementById('entertainmentChannels');
-            var kidsList = document.getElementById('kidsChannels');
-
-            if (!newsList || !musicList || !entertainmentList || !kidsList) {
-                console.error("Ett eller flera element saknas: newsChannels, musicChannels, entertainmentChannels, kidsChannels");
-                return;
-            }
-
-            // Nyheter
-            channels.news.forEach(function(channel) {
-                var channelDiv = document.createElement('div');
-                channelDiv.className = 'channel';
-                channelDiv.textContent = channel.name;
-                channelDiv.onclick = function() { handleChannelClick(channel); };
-                newsList.appendChild(channelDiv);
-            });
-
-            // Musik
-            channels.music.forEach(function(channel) {
-                var channelDiv = document.createElement('div');
-                channelDiv.className = 'channel';
-                channelDiv.textContent = channel.name;
-                channelDiv.onclick = function() { handleChannelClick(channel); };
-                musicList.appendChild(channelDiv);
-            });
-
-            // Underhållning
-            channels.entertainment.forEach(function(channel) {
-                var channelDiv = document.createElement('div');
-                channelDiv.className = 'channel';
-                channelDiv.textContent = channel.name;
-                channelDiv.onclick = function() { handleChannelClick(channel); };
-                entertainmentList.appendChild(channelDiv);
-            });
-
-            // Barn
-            channels.kids.forEach(function(channel) {
-                var channelDiv = document.createElement('div');
-                channelDiv.className = 'channel';
-                channelDiv.textContent = channel.name;
-                channelDiv.onclick = function() { handleChannelClick(channel); };
-                kidsList.appendChild(channelDiv);
-            });
-
-            console.log("Kanallistan har genererats.");
-        }
-
-        // Hantera klick på en kanal
-        function handleChannelClick(channel) {
-            console.log("Klickade på kanal: " + channel.name);
-            // Dölj båda spelarna som standard
-            mainVideo.style.display = 'none';
-            iframeContainer.style.display = 'none';
-
-            if (channel.isIframe) {
-                console.log("Visar iframe för: " + channel.url);
-                channelIframe.src = channel.url; // Sätt iframe-URL:en
-                iframeContainer.style.display = 'block'; // Visa iframe-containern
-            } else if (channel.redirect) {
-                console.log("Omdirigerar till: " + channel.url);
-                if (channel.newTab) {
-                    window.open(channel.url, '_blank');
-                } else {
-                    window.location.href = channel.url;
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialisera Video.js med HLS-stöd
+            const mainPlayer = videojs('main-video', {
+                fluid: true,
+                responsive: true,
+                html5: {
+                    hls: {
+                        overrideNative: true
+                    }
                 }
-            } else {
-                console.log("Spelar upp ström: " + channel.url);
-                mainVideo.style.display = 'block'; // Visa Video.js-spelaren
-                playStream(channel.url);
+            });
+
+            const iframeContainer = document.getElementById('iframe-container');
+            const channelIframe = document.getElementById('channel-iframe');
+            const videoContainer = document.querySelector('.video-container');
+
+            // Lista med alla kanaler
+            const channels = {
+                news: [
+                    { name: "Zagros", url: "https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8" },
+                    { name: "Zoom", url: "https://live.zoomnews.info/live/Zoom_playlist.m3u8" },
+                    { name: "kanal8", url: "https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8" },
+                    { name: "Rudaw", url: "https://svs.itworkscdn.net/rudawlive/rudawlive.smil/playlist.m3u8" },
+                    { name: "Kurdsat News", url: "https://kurdsat-news.akamaized.net/hls/kurdsat-news.m3u8" },
+                    { name: "Kurdistan24", url: "https://d1x82nydcxndze.cloudfront.net/live/index_720p25.m3u8" },
+                    { name: "Sterk", url: "https://muzkurd.com/sterktv/sterk/chunklist_w913361557.m3u8" },
+                    { name: "NRT News", url: "https://media.streambrothers.com:1936/8226/8226/playlist.m3u8" }
+                ],
+                music: [
+                    { name: "Med music", url: "http://54.36.110.140/live3/live3.m3u8" },
+                    { name: "4 Kurd", url: "https://4kuhls.persiana.live/hls/stream.m3u8" }
+                ],
+                entertainment: [
+                    { name: "Aryen", url: "https://aryen.tv/live/tv/playlist.m3u8" },
+                    { name: "Cira", url: "https://cira-tv.akamaized.net/hls/stream_0.m3u8" },
+                    { name: "Waar", url: "https://live.kwikmotion.com/waarmedialive/waarmedia.smil/waarmediapublish/waarmedia_source/chunks.m3u8" },
+                    { name: "Rojava", url: "https://rojava-tv.akamaized.net/hls/rojava-tv.m3u8" },
+                    { name: "Payam", url: "https://media2.streambrothers.com:1936/8218/8218/playlist.m3u8" },
+                    { name: "Kurdsat HD", url: "https://kurdsat.akamaized.net/hls/kurdsat.m3u8" },
+                    { name: "Kurdistan TV", url: "https://5a3ed7a72ed4b.streamlock.net/live/SMIL:myStream.smil/playlist.m3u8" },
+                    { name: "PDKI", url: "https://iko-live.akamaized.net/kurdhd/master.m3u8" },
+                    { name: "Komala", url: "https://live.tvkomala.com/live/komala/playlist.m3u8" },
+                    { name: "GK", url: "https://live.host247.net/gk/gksat/playlist.m3u8" },
+                    { name: "IRIB Kurdistan", url: "https://lenz.splus.ir/PLTV/88888888/224/3221226647/index.m3u8" },
+                    { name: "Mahabad", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
+                    { name: "TRT Kurdi", url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8" },
+                    { name: "Speda", url: "https://www.speda.net/tv1/", redirect: true, newTab: true },
+                    { name: "Sahar", url: "https://kurdish.sahartv.ir/live", isIframe: true },
+                    { name: "Ava TV", url: "https://ava2.site/upload/ava.m3u8" },
+                    { name: "Shar TV", url: "http://avrstream.com:1935/live/SHARTV/chunklist_w2095841563.m3u8" },
+                    { name: "Ronahi", url: "https://ronahi-tv.akamaized.net/hls/stream_0.m3u8" },
+                    { name: "Amozhgary", url: "https://app-live.org/live/3268334b/index.m3u8" },
+                    { name: "Sada", url: "https://sadatv.icdndhcp.com/live/sadatv/playlist.m3u8" },
+                    { name: "UTV Hawler", url: "https://utvhawler.net/index.htm", redirect: true, newTab: true },
+                    { name: "ALA", url: "https://karwan.tv/ala-tv.html", redirect: true, newTab: true },
+                    { name: "ANIMAL", url: "https://karwan.tv/animal-box.html", redirect: true, newTab: true },
+                    { name: "AVAR", url: "https://karwan.tv/avar-tv.html", redirect: true, newTab: true },
+                    { name: "Kirkuk TV", url: "https://live.kirkuklive.live/hls/stream/index.m3u8" }
+                ],
+                kids: [
+                    { name: "Baxche", url: "https://5dcabf026b188.streamlock.net/afarinTV/livestream/playlist.m3u8" },
+                    { name: "Afarin Kids", url: "https://65f16f0fdfc51.streamlock.net/afarinTV/livestream/playlist.m3u8" },
+                    { name: "Zarok Kurmanci", url: "https://zindikurmanci.zaroktv.com.tr/hls/0/stream.m3u8" },
+                    { name: "Zarok Sorani", url: "https://zindisorani.zaroktv.com.tr/hls/stream.m3u8" }
+                ]
+            };
+
+            // Generera kanalerna dynamiskt
+            function generateChannels() {
+                console.log("Genererar kanaler...");
+                const newsList = document.getElementById('newsChannels');
+                const musicList = document.getElementById('musicChannels');
+                const entertainmentList = document.getElementById('entertainmentChannels');
+                const kidsList = document.getElementById('kidsChannels');
+
+                if (!newsList || !musicList || !entertainmentList || !kidsList) {
+                    console.error("Ett eller flera element saknas");
+                    return;
+                }
+
+                Object.keys(channels).forEach(category => {
+                    channels[category].forEach(channel => {
+                        const channelDiv = document.createElement('div');
+                        channelDiv.className = 'channel';
+                        channelDiv.textContent = channel.name;
+                        channelDiv.addEventListener('click', () => handleChannelClick(channel));
+                        document.getElementById(`${category}Channels`).appendChild(channelDiv);
+                    });
+                });
+                console.log("Kanallistan har genererats.");
             }
-        }
 
-        function playStream(url) {
-            console.log("Spelar upp ström i videospelaren: " + url);
-            mainPlayer.src({ src: url, type: 'application/x-mpegURL' });
-            mainPlayer.play();
-        }
+            // Hantera klick på en kanal
+            function handleChannelClick(channel) {
+                console.log("Klickade på kanal: " + channel.name);
+                videoContainer.style.display = 'none';
+                iframeContainer.style.display = 'none';
+                mainPlayer.pause();
 
-        // Kör funktionen för att generera kanalerna när sidan laddas
-        try {
-            generateChannels();
-        } catch (error) {
-            console.error("Fel vid generering av kanaler: ", error);
-        }
+                if (channel.isIframe) {
+                    console.log("Visar iframe för: " + channel.url);
+                    channelIframe.src = channel.url;
+                    iframeContainer.style.display = 'block';
+                } else if (channel.redirect) {
+                    console.log("Omdirigerar till: " + channel.url);
+                    if (channel.newTab) {
+                        window.open(channel.url, '_blank');
+                    } else {
+                        window.location.href = channel.url;
+                    }
+                } else {
+                    console.log("Spelar upp ström: " + channel.url);
+                    videoContainer.style.display = 'block';
+                    playStream(channel.url);
+                }
+            }
+
+            // Spela upp ström med felhantering
+            function playStream(url) {
+                console.log("Försöker spela upp: " + url);
+                mainPlayer.src({
+                    src: url,
+                    type: 'application/x-mpegURL'
+                });
+                mainPlayer.ready(function () {
+                    mainPlayer.play().catch(error => {
+                        console.error("Uppspelningsfel för " + url + ":", error);
+                        alert("Kunde inte spela upp strömmen. Det kan bero på CORS, en trasig länk eller serverproblem.");
+                    });
+                });
+            }
+
+            // Starta generering av kanaler
+            try {
+                generateChannels();
+            } catch (error) {
+                console.error("Fel vid generering av kanaler:", error);
+            }
+        });
     </script>
 </body>
 </html>
