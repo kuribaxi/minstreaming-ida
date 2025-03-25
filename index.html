@@ -62,51 +62,12 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            position: relative; /* För att positionera popup */
         }
         .video-container { 
             width: 100%; 
             max-width: 800px; 
             margin: 20px 0; 
             display: none; /* Dold som standard */
-        }
-        .popup-container { 
-            display: none; 
-            position: absolute; 
-            top: 20px; 
-            width: 100%; 
-            max-width: 800px; 
-            height: 450px; 
-            background: #333; 
-            border: 2px solid #e50914; 
-            border-radius: 5px; 
-            z-index: 1000; 
-        }
-        .popup-header { 
-            background: #e50914; 
-            padding: 5px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .popup-header span { 
-            font-size: 1.2em; 
-        }
-        .popup-close { 
-            background: none; 
-            border: none; 
-            color: #fff; 
-            font-size: 1.5em; 
-            cursor: pointer; 
-        }
-        .popup-content { 
-            width: 100%; 
-            height: calc(100% - 35px); /* Subtrahera header-höjden */
-        }
-        .popup-content iframe { 
-            width: 100%; 
-            height: 100%; 
-            border: none; 
         }
     </style>
 </head>
@@ -139,15 +100,6 @@
                     <source src="" type="application/x-mpegURL">
                 </video>
             </div>
-            <div id="popup-container" class="popup-container">
-                <div class="popup-header">
-                    <span id="popup-title"></span>
-                    <button class="popup-close" id="popup-close">✖</button>
-                </div>
-                <div class="popup-content">
-                    <iframe id="popup-iframe" src="" allowfullscreen allow="fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="yes"></iframe>
-                </div>
-            </div>
         </div>
     </div>
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
@@ -164,10 +116,6 @@
             });
 
             const videoContainer = document.querySelector('.video-container');
-            const popupContainer = document.getElementById('popup-container');
-            const popupIframe = document.getElementById('popup-iframe');
-            const popupTitle = document.getElementById('popup-title');
-            const popupClose = document.getElementById('popup-close');
 
             function formatChannelName(url) {
                 const namePart = url.split('/').pop().replace('.html', '').replace(/-/g, ' ');
@@ -284,7 +232,6 @@
                         if (!channel.redirect) {
                             channelDiv.addEventListener('mouseenter', () => {
                                 videoContainer.style.display = 'block';
-                                popupContainer.style.display = 'none';
                                 playStream(channel.url);
                             });
 
@@ -303,14 +250,11 @@
             function handleChannelClick(channel) {
                 console.log("Klickade på kanal: " + channel.name);
                 videoContainer.style.display = 'none';
-                popupContainer.style.display = 'none';
                 mainPlayer.pause();
 
                 if (channel.redirect && channel.newTab) {
-                    console.log("Öppnar popup för: " + channel.url);
-                    popupTitle.textContent = channel.name;
-                    popupIframe.src = channel.url;
-                    popupContainer.style.display = 'block';
+                    console.log("Öppnar i riktigt popup-fönster: " + channel.url);
+                    window.open(channel.url, channel.name, 'width=800,height=450,scrollbars=yes,resizable=yes');
                 } else {
                     console.log("Spelar upp ström: " + channel.url);
                     videoContainer.style.display = 'block';
@@ -331,12 +275,6 @@
                     });
                 });
             }
-
-            // Stäng popup
-            popupClose.addEventListener('click', () => {
-                popupContainer.style.display = 'none';
-                popupIframe.src = ''; // Rensa iframe
-            });
 
             try {
                 generateChannels();
