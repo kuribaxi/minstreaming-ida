@@ -45,6 +45,7 @@
             cursor: pointer; 
             border-radius: 5px; 
             transition: background 0.3s; 
+            position: relative; 
         }
         .channel:hover { 
             background: #e50914; 
@@ -60,6 +61,22 @@
             height: 450px; 
             margin: 20px auto; 
             display: none; 
+        }
+        .preview-video {
+            position: absolute;
+            top: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 120px;
+            display: none;
+            z-index: 1000;
+            background: #000;
+            border: 2px solid #e50914;
+            border-radius: 5px;
+        }
+        .channel:hover .preview-video {
+            display: block;
         }
     </style>
 </head>
@@ -96,7 +113,7 @@
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialisera Video.js med HLS-stöd
+            // Initialisera Video.js för huvudspelaren
             const mainPlayer = videojs('main-video', {
                 fluid: true,
                 responsive: true,
@@ -154,7 +171,8 @@
                     { name: "IRIB Kurdistan", url: "https://lenz.splus.ir/PLTV/88888888/224/3221226647/index.m3u8" },
                     { name: "Mahabad", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
                     { name: "TRT Kurdi", url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8" },
-                    { name: "Sahar", url: "https://kurdish.sahartv.ir/live", isIframe: true },
+                    // Ändrad från isIframe till redirect för att fixa helskärm
+                    { name: "Sahar", url: "https://kurdish.sahartv.ir/live", redirect: true, newTab: true },
                     { name: "Ava TV", url: "https://ava2.site/upload/ava.m3u8" },
                     { name: "UTV Hawler", url: "https://utvhawler.net/index.htm", redirect: true, newTab: true },
                     { name: "ALA", url: "https://karwan.tv/ala-tv.html", redirect: true, newTab: true },
@@ -224,6 +242,38 @@
                         const channelDiv = document.createElement('div');
                         channelDiv.className = 'channel';
                         channelDiv.textContent = channel.name;
+
+                        // Skapa preview-video för kanaler med ström-URL
+                        if (!channel.redirect && !channel.isIframe) {
+                            const previewVideo = document.createElement('video');
+                            previewVideo.id = `preview-${channel.name.replace(/\s+/g, '-')}`;
+                            previewVideo.className = 'preview-video video-js';
+                            channelDiv.appendChild(previewVideo);
+
+                            const player = videojs(previewVideo, {
+                                muted: false,
+                                controls: false,
+                                autoplay: false,
+                                width: 200,
+                                height: 120,
+                                sources: [{
+                                    src: channel.url,
+                                    type: 'application/x-mpegURL'
+                                }]
+                            });
+
+                            channelDiv.addEventListener('mouseenter', () => {
+                                player.play().catch(err => {
+                                    console.error(`Kunde inte spela upp förhandsvisning för ${channel.name}:`, err);
+                                });
+                            });
+
+                            channelDiv.addEventListener('mouseleave', () => {
+                                player.pause();
+                                player.currentTime(0);
+                            });
+                        }
+
                         channelDiv.addEventListener('click', () => handleChannelClick(channel));
                         document.getElementById(`${category}Channels`).appendChild(channelDiv);
                     });
@@ -256,7 +306,7 @@
                 }
             }
 
-            // Spela upp ström med felhantering
+            // Spela upp ström i huvudspelaren
             function playStream(url) {
                 console.log("Försöker spela upp: " + url);
                 mainPlayer.src({
