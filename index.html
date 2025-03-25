@@ -12,10 +12,19 @@
             color: #fff; 
             font-family: Arial, sans-serif; 
             padding: 20px; 
+            display: flex; /* Ny layout med flex */
+            height: 100vh; /* Fyll hela skärmhöjden */
         }
         .container { 
+            display: flex; 
+            width: 100%; 
             max-width: 1200px; 
             margin: 0 auto; 
+        }
+        .sidebar { 
+            width: 200px; /* Fast bredd för kanallistan */
+            overflow-y: auto; /* Skroll om det blir för många kanaler */
+            padding-right: 20px; 
         }
         h1 { 
             text-align: center; 
@@ -24,7 +33,7 @@
             color: #e50914; 
         }
         .category { 
-            margin-bottom: 30px; 
+            margin-bottom: 20px; 
         }
         .category h2 { 
             font-size: 1.5em; 
@@ -34,13 +43,12 @@
         }
         .channel-list { 
             display: flex; 
-            flex-wrap: wrap; 
+            flex-direction: column; /* Lodrät lista */
             gap: 10px; 
         }
         .channel { 
             background: #333; 
             padding: 10px; 
-            width: 120px; 
             text-align: center; 
             cursor: pointer; 
             border-radius: 5px; 
@@ -50,70 +58,79 @@
         .channel:hover { 
             background: #e50914; 
         }
-        .video-container {
-            width: 100%;
-            max-width: 800px;
-            margin: 20px auto;
+        .content { 
+            flex: 1; /* Tar upp resten av utrymmet till höger */
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        .video-container { 
+            width: 100%; 
+            max-width: 800px; 
+            margin: 20px 0; 
         }
         .iframe-container { 
             width: 100%; 
             max-width: 800px; 
             height: 450px; 
-            margin: 20px auto; 
+            margin: 20px 0; 
             display: none; 
         }
-        .preview-video {
-            position: absolute;
-            top: -150px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 120px;
-            display: none;
-            z-index: 1000;
-            background: #000;
-            border: 2px solid #e50914;
-            border-radius: 5px;
+        .preview-video { 
+            position: absolute; 
+            top: 50%; 
+            left: 100%; /* Placera till höger om kanalnamnet */
+            transform: translateY(-50%); 
+            width: 200px; 
+            height: 120px; 
+            display: none; 
+            z-index: 1000; 
+            background: #000; 
+            border: 2px solid #e50914; 
+            border-radius: 5px; 
         }
-        .channel:hover .preview-video {
-            display: block;
+        .channel:hover .preview-video { 
+            display: block; 
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Min Streamingsida</h1>
-        <div id="categories">
-            <div class="category">
-                <h2>Nyheter</h2>
-                <div class="channel-list" id="newsChannels"></div>
-            </div>
-            <div class="category">
-                <h2>Musik</h2>
-                <div class="channel-list" id="musicChannels"></div>
-            </div>
-            <div class="category">
-                <h2>Underhållning</h2>
-                <div class="channel-list" id="entertainmentChannels"></div>
-            </div>
-            <div class="category">
-                <h2>Barn</h2>
-                <div class="channel-list" id="kidsChannels"></div>
+        <div class="sidebar">
+            <h1>Min Streamingsida</h1>
+            <div id="categories">
+                <div class="category">
+                    <h2>Nyheter</h2>
+                    <div class="channel-list" id="newsChannels"></div>
+                </div>
+                <div class="category">
+                    <h2>Musik</h2>
+                    <div class="channel-list" id="musicChannels"></div>
+                </div>
+                <div class="category">
+                    <h2>Underhållning</h2>
+                    <div class="channel-list" id="entertainmentChannels"></div>
+                </div>
+                <div class="category">
+                    <h2>Barn</h2>
+                    <div class="channel-list" id="kidsChannels"></div>
+                </div>
             </div>
         </div>
-        <div class="video-container">
-            <video id="main-video" class="video-js vjs-default-skin" controls autoplay width="100%" height="450">
-                <source src="" type="application/x-mpegURL">
-            </video>
-        </div>
-        <div id="iframe-container" class="iframe-container">
-            <iframe id="channel-iframe" src="" height="450" width="100%" style="border:0px #FFFFFF none;" allowfullscreen allow="fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no"></iframe>
+        <div class="content">
+            <div class="video-container">
+                <video id="main-video" class="video-js vjs-default-skin" controls autoplay width="100%" height="450">
+                    <source src="" type="application/x-mpegURL">
+                </video>
+            </div>
+            <div id="iframe-container" class="iframe-container">
+                <iframe id="channel-iframe" src="" height="450" width="100%" style="border:0px #FFFFFF none;" allowfullscreen allow="fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no"></iframe>
+            </div>
         </div>
     </div>
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialisera Video.js för huvudspelaren
             const mainPlayer = videojs('main-video', {
                 fluid: true,
                 responsive: true,
@@ -128,13 +145,11 @@
             const channelIframe = document.getElementById('channel-iframe');
             const videoContainer = document.querySelector('.video-container');
 
-            // Funktion för att formatera namn från URL
             function formatChannelName(url) {
                 const namePart = url.split('/').pop().replace('.html', '').replace(/-/g, ' ');
                 return namePart.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
             }
 
-            // Lista med alla kanaler
             const channels = {
                 news: [
                     { name: "Zagros", url: "https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8" },
@@ -171,7 +186,6 @@
                     { name: "IRIB Kurdistan", url: "https://lenz.splus.ir/PLTV/88888888/224/3221226647/index.m3u8" },
                     { name: "Mahabad", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
                     { name: "TRT Kurdi", url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8" },
-                    // Ändrad från isIframe till redirect för att fixa helskärm
                     { name: "Sahar", url: "https://kurdish.sahartv.ir/live", redirect: true, newTab: true },
                     { name: "Ava TV", url: "https://ava2.site/upload/ava.m3u8" },
                     { name: "UTV Hawler", url: "https://utvhawler.net/index.htm", redirect: true, newTab: true },
@@ -224,7 +238,6 @@
                 ]
             };
 
-            // Generera kanalerna dynamiskt
             function generateChannels() {
                 console.log("Genererar kanaler...");
                 const newsList = document.getElementById('newsChannels');
@@ -243,7 +256,6 @@
                         channelDiv.className = 'channel';
                         channelDiv.textContent = channel.name;
 
-                        // Skapa preview-video för kanaler med ström-URL
                         if (!channel.redirect && !channel.isIframe) {
                             const previewVideo = document.createElement('video');
                             previewVideo.id = `preview-${channel.name.replace(/\s+/g, '-')}`;
@@ -281,7 +293,6 @@
                 console.log("Kanallistan har genererats.");
             }
 
-            // Hantera klick på en kanal
             function handleChannelClick(channel) {
                 console.log("Klickade på kanal: " + channel.name);
                 videoContainer.style.display = 'none';
@@ -295,7 +306,7 @@
                 } else if (channel.redirect) {
                     console.log("Omdirigerar till: " + channel.url);
                     if (channel.newTab) {
-                        window.open(channel.url, '_blank');
+                        windowouthwest: window.open(channel.url, '_blank');
                     } else {
                         window.location.href = channel.url;
                     }
@@ -306,7 +317,6 @@
                 }
             }
 
-            // Spela upp ström i huvudspelaren
             function playStream(url) {
                 console.log("Försöker spela upp: " + url);
                 mainPlayer.src({
@@ -321,7 +331,6 @@
                 });
             }
 
-            // Starta generering av kanaler
             try {
                 generateChannels();
             } catch (error) {
