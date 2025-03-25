@@ -67,13 +67,22 @@
             width: 100%; 
             max-width: 800px; 
             margin: 20px 0; 
+            display: none; /* Dold som standard */
         }
         .iframe-container { 
             width: 100%; 
             max-width: 800px; 
             height: 450px; 
             margin: 20px 0; 
+            display: none; /* Dold som standard */
+            position: relative; 
+        }
+        .iframe-fallback { 
             display: none; 
+            text-align: center; 
+            padding: 20px; 
+            background: #333; 
+            border-radius: 5px; 
         }
     </style>
 </head>
@@ -107,7 +116,10 @@
                 </video>
             </div>
             <div id="iframe-container" class="iframe-container">
-                <iframe id="channel-iframe" src="" height="450" width="100%" style="border:0px #FFFFFF none;" allowfullscreen allow="fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no"></iframe>
+                <iframe id="channel-iframe" src="" height="450" width="100%" style="border:0px #FFFFFF none;" allowfullscreen allow="fullscreen" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="yes"></iframe>
+                <div class="iframe-fallback" id="iframe-fallback">
+                    <p>Kunde inte ladda innehållet här. <a id="fallback-link" href="#" target="_blank">Öppna i ny flik</a></p>
+                </div>
             </div>
         </div>
     </div>
@@ -127,6 +139,8 @@
             const iframeContainer = document.getElementById('iframe-container');
             const channelIframe = document.getElementById('channel-iframe');
             const videoContainer = document.querySelector('.video-container');
+            const iframeFallback = document.getElementById('iframe-fallback');
+            const fallbackLink = document.getElementById('fallback-link');
 
             function formatChannelName(url) {
                 const namePart = url.split('/').pop().replace('.html', '').replace(/-/g, ' ');
@@ -143,18 +157,18 @@
                     { name: "Sterk", url: "https://muzkurd.com/sterktv/sterk/chunklist_w913361557.m3u8" },
                     { name: "NRT News", url: "https://media.streambrothers.com:1936/8226/8226/playlist.m3u8" },
                     { name: "Kurdistan24", url: "https://d1x82nydcxndze.cloudfront.net/live/index_720p25.m3u8" },
-                    { name: formatChannelName("https://karwan.tv/kurdsat-news-tv.html"), url: "https://karwan.tv/kurdsat-news-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/mmn-news.html"), url: "https://karwan.tv/mmn-news.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/shams-tv.html"), url: "https://karwan.tv/shams-tv.html", isIframe: true }
+                    { name: formatChannelName("https://karwan.tv/kurdsat-news-tv.html"), url: "https://karwan.tv/kurdsat-news-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/mmn-news.html"), url: "https://karwan.tv/mmn-news.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/shams-tv.html"), url: "https://karwan.tv/shams-tv.html", redirect: true, newTab: true }
                 ],
                 music: [
                     { name: "4 Kurd", url: "https://4kuhls.persiana.live/hls/stream.m3u8" },
                     { name: "Med Music", url: "http://54.36.110.140/live3/live3.m3u8" },
-                    { name: formatChannelName("https://karwan.tv/med-muzik-tv.html"), url: "https://karwan.tv/med-muzik-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/mmn-clip.html"), url: "https://karwan.tv/mmn-clip.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/graryan-tv.html"), url: "https://karwan.tv/graryan-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/kanal-21.html"), url: "https://karwan.tv/kanal-21.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/kurd-7.html"), url: "https://karwan.tv/kurd-7.html", isIframe: true }
+                    { name: formatChannelName("https://karwan.tv/med-muzik-tv.html"), url: "https://karwan.tv/med-muzik-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/mmn-clip.html"), url: "https://karwan.tv/mmn-clip.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/graryan-tv.html"), url: "https://karwan.tv/graryan-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/kanal-21.html"), url: "https://karwan.tv/kanal-21.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/kurd-7.html"), url: "https://karwan.tv/kurd-7.html", redirect: true, newTab: true }
                 ],
                 entertainment: [
                     { name: "Aryen", url: "https://aryen.tv/live/tv/playlist.m3u8" },
@@ -169,55 +183,55 @@
                     { name: "IRIB Kurdistan", url: "https://lenz.splus.ir/PLTV/88888888/224/3221226647/index.m3u8" },
                     { name: "Mahabad", url: "https://ncdn.telewebion.com/mahabad/live/playlist.m3u8" },
                     { name: "TRT Kurdi", url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8" },
-                    { name: "Sahar", url: "https://kurdish.sahartv.ir/live", isIframe: true },
+                    { name: "Sahar", url: "https://kurdish.sahartv.ir/live", redirect: true, newTab: true },
                     { name: "Ava TV", url: "https://ava2.site/upload/ava.m3u8" },
-                    { name: "UTV Hawler", url: "https://utvhawler.net/index.htm", isIframe: true },
-                    { name: "ALA", url: "https://karwan.tv/ala-tv.html", isIframe: true },
-                    { name: "ANIMAL", url: "https://karwan.tv/animal-box.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/mmn-documentary.html"), url: "https://karwan.tv/mmn-documentary.html", isIframe: true },
-                    { name: "AVAR", url: "https://karwan.tv/avar-tv.html", isIframe: true },
+                    { name: "UTV Hawler", url: "https://utvhawler.net/index.htm", redirect: true, newTab: true },
+                    { name: "ALA", url: "https://karwan.tv/ala-tv.html", redirect: true, newTab: true },
+                    { name: "ANIMAL", url: "https://karwan.tv/animal-box.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/mmn-documentary.html"), url: "https://karwan.tv/mmn-documentary.html", redirect: true, newTab: true },
+                    { name: "AVAR", url: "https://karwan.tv/avar-tv.html", redirect: true, newTab: true },
                     { name: "Kirkuk TV", url: "https://live.kirkuklive.live/hls/stream/index.m3u8" },
-                    { name: formatChannelName("https://karwan.tv/welat-tv.html"), url: "https://karwan.tv/welat-tv.html", isIframe: true },
-                    { name: "Barin-family", url: "https://karwan.tv/barin-family.html", isIframe: true },
+                    { name: formatChannelName("https://karwan.tv/welat-tv.html"), url: "https://karwan.tv/welat-tv.html", redirect: true, newTab: true },
+                    { name: "Barin-family", url: "https://karwan.tv/barin-family.html", redirect: true, newTab: true },
                     { name: "Payam", url: "https://media2.streambrothers.com:1936/8218/8218/playlist.m3u8" },
-                    { name: "Speda", url: "https://www.speda.net/tv1/", isIframe: true },
+                    { name: "Speda", url: "https://www.speda.net/tv1/", redirect: true, newTab: true },
                     { name: "Shar TV", url: "http://avrstream.com:1935/live/SHARTV/chunklist_w2095841563.m3u8" },
                     { name: "Sada", url: "https://sadatv.icdndhcp.com/live/sadatv/playlist.m3u8" },
                     { name: "Ronahi", url: "https://ronahi-tv.akamaized.net/hls/stream_0.m3u8" },
                     { name: "Amozhgary", url: "https://app-live.org/live/3268334b/index.m3u8" },
-                    { name: "Barin Quran", url: "https://karwan.tv/barin-quran.html", isIframe: true },
-                    { name: "Bangewaz", url: "https://karwan.tv/bangawaz-tv.html", isIframe: true },
-                    { name: "Bangxwazen-badinan", url: "https://karwan.tv/bangxwazen-badinan-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/mmn-quran-tv.html"), url: "https://karwan.tv/mmn-quran-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/eman-tv.html"), url: "https://karwan.tv/eman-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/shna-tv.html"), url: "https://karwan.tv/shna-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/nr1-kurd.html"), url: "https://karwan.tv/nr1-kurd.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/mihrab-tv.html"), url: "https://karwan.tv/mihrab-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/esra-tv.html"), url: "https://karwan.tv/esra-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/znar-tv.html"), url: "https://karwan.tv/znar-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/befrin-tv.html"), url: "https://karwan.tv/befrin-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/derin-tv.html"), url: "https://karwan.tv/derin-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/euro-kurd-tv.html"), url: "https://karwan.tv/euro-kurd-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/halabja-tv.html"), url: "https://karwan.tv/halabja-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/khak-tv.html"), url: "https://karwan.tv/khak-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/knn-tv.html"), url: "https://karwan.tv/knn-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/kurdmax-show-tv.html"), url: "https://karwan.tv/kurdmax-show-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/kurdmax-tv.html"), url: "https://karwan.tv/kurdmax-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/mix-tv.html"), url: "https://karwan.tv/mix-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/mmn-drama.html"), url: "https://karwan.tv/mmn-drama.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/mmn-show.html"), url: "https://karwan.tv/mmn-show.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/mmn-movies.html"), url: "https://karwan.tv/mmn-movies.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/soran-entertainment-tv.html"), url: "https://karwan.tv/soran-entertainment-tv.html", isIframe: true }
+                    { name: "Barin Quran", url: "https://karwan.tv/barin-quran.html", redirect: true, newTab: true },
+                    { name: "Bangewaz", url: "https://karwan.tv/bangawaz-tv.html", redirect: true, newTab: true },
+                    { name: "Bangxwazen-badinan", url: "https://karwan.tv/bangxwazen-badinan-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/mmn-quran-tv.html"), url: "https://karwan.tv/mmn-quran-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/eman-tv.html"), url: "https://karwan.tv/eman-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/shna-tv.html"), url: "https://karwan.tv/shna-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/nr1-kurd.html"), url: "https://karwan.tv/nr1-kurd.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/mihrab-tv.html"), url: "https://karwan.tv/mihrab-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/esra-tv.html"), url: "https://karwan.tv/esra-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/znar-tv.html"), url: "https://karwan.tv/znar-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/befrin-tv.html"), url: "https://karwan.tv/befrin-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/derin-tv.html"), url: "https://karwan.tv/derin-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/euro-kurd-tv.html"), url: "https://karwan.tv/euro-kurd-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/halabja-tv.html"), url: "https://karwan.tv/halabja-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/khak-tv.html"), url: "https://karwan.tv/khak-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/knn-tv.html"), url: "https://karwan.tv/knn-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/kurdmax-show-tv.html"), url: "https://karwan.tv/kurdmax-show-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/kurdmax-tv.html"), url: "https://karwan.tv/kurdmax-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/mix-tv.html"), url: "https://karwan.tv/mix-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/mmn-drama.html"), url: "https://karwan.tv/mmn-drama.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/mmn-show.html"), url: "https://karwan.tv/mmn-show.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/mmn-movies.html"), url: "https://karwan.tv/mmn-movies.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/soran-entertainment-tv.html"), url: "https://karwan.tv/soran-entertainment-tv.html", redirect: true, newTab: true }
                 ],
                 kids: [
                     { name: "Baxche", url: "https://5dcabf026b188.streamlock.net/afarinTV/livestream/playlist.m3u8" },
                     { name: "Afarin Kids", url: "https://65f16f0fdfc51.streamlock.net/afarinTV/livestream/playlist.m3u8" },
                     { name: "Zarok Kurmanci", url: "https://zindikurmanci.zaroktv.com.tr/hls/0/stream.m3u8" },
                     { name: "Zarok Sorani", url: "https://zindisorani.zaroktv.com.tr/hls/stream.m3u8" },
-                    { name: formatChannelName("https://karwan.tv/kidco-tv.html"), url: "https://karwan.tv/kidco-tv.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/mmn-kids.html"), url: "https://karwan.tv/mmn-kids.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/nrt-3-kids.html"), url: "https://karwan.tv/nrt-3-kids.html", isIframe: true },
-                    { name: formatChannelName("https://karwan.tv/afarin-baxcha.html"), url: "https://karwan.tv/afarin-baxcha.html", isIframe: true }
+                    { name: formatChannelName("https://karwan.tv/kidco-tv.html"), url: "https://karwan.tv/kidco-tv.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/mmn-kids.html"), url: "https://karwan.tv/mmn-kids.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/nrt-3-kids.html"), url: "https://karwan.tv/nrt-3-kids.html", redirect: true, newTab: true },
+                    { name: formatChannelName("https://karwan.tv/afarin-baxcha.html"), url: "https://karwan.tv/afarin-baxcha.html", redirect: true, newTab: true }
                 ]
             };
 
@@ -240,10 +254,11 @@
                         channelDiv.textContent = channel.name;
 
                         // Hover: Spela upp i stora spelaren (bara för strömkanaler)
-                        if (!channel.isIframe) {
+                        if (!channel.redirect) {
                             channelDiv.addEventListener('mouseenter', () => {
                                 videoContainer.style.display = 'block';
                                 iframeContainer.style.display = 'none';
+                                iframeFallback.style.display = 'none';
                                 playStream(channel.url);
                             });
 
@@ -263,12 +278,24 @@
                 console.log("Klickade på kanal: " + channel.name);
                 videoContainer.style.display = 'none';
                 iframeContainer.style.display = 'none';
+                iframeFallback.style.display = 'none';
                 mainPlayer.pause();
 
-                if (channel.isIframe) {
-                    console.log("Visar iframe för: " + channel.url);
+                if (channel.redirect && channel.newTab) {
+                    console.log("Försöker visa i iframe: " + channel.url);
                     channelIframe.src = channel.url;
                     iframeContainer.style.display = 'block';
+
+                    // Kontrollera om iframe laddas korrekt
+                    channelIframe.onload = () => {
+                        iframeFallback.style.display = 'none';
+                    };
+                    channelIframe.onerror = () => {
+                        console.error("Iframe kunde inte laddas för: " + channel.url);
+                        iframeFallback.style.display = 'block';
+                        fallbackLink.href = channel.url;
+                        channelIframe.style.display = 'none';
+                    };
                 } else {
                     console.log("Spelar upp ström: " + channel.url);
                     videoContainer.style.display = 'block';
