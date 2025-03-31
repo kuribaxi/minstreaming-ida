@@ -60,6 +60,8 @@
             border-radius: 5px; 
             transition: background 0.3s; 
             position: relative;
+            display: flex;
+            align-items: center;
         }
         .channel:hover { 
             background: #e50914; 
@@ -78,17 +80,22 @@
             display: none;
         }
         .fav-btn {
-            position: absolute;
-            right: 5px;
-            top: 5px;
             background: none;
             border: none;
             color: #fff;
             cursor: pointer;
             font-size: 16px;
+            margin-right: 5px;
         }
         .fav-btn:hover {
             color: #e50914;
+        }
+        .error-message {
+            color: #e50914;
+            font-size: 0.9em;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
         }
     </style>
 </head>
@@ -96,13 +103,25 @@
     <div class="container">
         <div class="favorites-sidebar">
             <h1>Favoriter</h1>
-            <div id="favoritesList" class="channel-list"></div>
+            <div class="category">
+                <h2>Favoritlista 1</h2>
+                <div id="favoritesList1" class="channel-list"></div>
+            </div>
+            <div class="category">
+                <h2>Favoritlista 2</h2>
+                <div id="favoritesList2" class="channel-list"></div>
+            </div>
+            <div class="category">
+                <h2>Favoritlista 3</h2>
+                <div id="favoritesList3" class="channel-list"></div>
+            </div>
         </div>
         <div class="content">
             <div class="video-container">
                 <video id="main-video" class="video-js vjs-default-skin" controls width="100%" height="450">
                     <source src="" type="application/x-mpegURL">
                 </video>
+                <div id="errorMessage" class="error-message"></div>
             </div>
         </div>
         <div class="channel-sidebar">
@@ -141,7 +160,10 @@
             });
 
             const videoContainer = document.querySelector('.video-container');
-            let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            const errorMessage = document.getElementById('errorMessage');
+            let favorites1 = JSON.parse(localStorage.getItem('favorites1')) || [];
+            let favorites2 = JSON.parse(localStorage.getItem('favorites2')) || [];
+            let favorites3 = JSON.parse(localStorage.getItem('favorites3')) || [];
 
             function formatChannelName(url) {
                 const namePart = url.split('/').pop().replace('.html', '').replace(/-/g, ' ');
@@ -237,28 +259,48 @@
             };
 
             function updateFavorites() {
-                const favList = document.getElementById('favoritesList');
-                favList.innerHTML = '';
-                favorites.forEach(channel => {
-                    const channelDiv = createChannelElement(channel);
-                    favList.appendChild(channelDiv);
-                });
-                localStorage.setItem('favorites', JSON.stringify(favorites));
+                const favList1 = document.getElementById('favoritesList1');
+                const favList2 = document.getElementById('favoritesList2');
+                const favList3 = document.getElementById('favoritesList3');
+                favList1.innerHTML = '';
+                favList2.innerHTML = '';
+                favList3.innerHTML = '';
+
+                favorites1.forEach(channel => favList1.appendChild(createChannelElement(channel)));
+                favorites2.forEach(channel => favList2.appendChild(createChannelElement(channel)));
+                favorites3.forEach(channel => favList3.appendChild(createChannelElement(channel)));
+
+                localStorage.setItem('favorites1', JSON.stringify(favorites1));
+                localStorage.setItem('favorites2', JSON.stringify(favorites2));
+                localStorage.setItem('favorites3', JSON.stringify(favorites3));
             }
 
             function createChannelElement(channel) {
                 const channelDiv = document.createElement('div');
                 channelDiv.className = 'channel';
-                channelDiv.textContent = channel.name;
 
-                const favBtn = document.createElement('button');
-                favBtn.className = 'fav-btn';
-                favBtn.textContent = favorites.some(f => f.url === channel.url) ? '★' : '☆';
-                favBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    toggleFavorite(channel);
-                };
-                channelDiv.appendChild(favBtn);
+                const star1 = document.createElement('button');
+                star1.className = 'fav-btn';
+                star1.textContent = favorites1.some(f => f.url === channel.url) ? '★' : '☆';
+                star1.onclick = (e) => { e.stopPropagation(); toggleFavorite(channel, 1); };
+
+                const star2 = document.createElement('button');
+                star2.className = 'fav-btn';
+                star2.textContent = favorites2.some(f => f.url === channel.url) ? '★' : '☆';
+                star2.onclick = (e) => { e.stopPropagation(); toggleFavorite(channel, 2); };
+
+                const star3 = document.createElement('button');
+                star3.className = 'fav-btn';
+                star3.textContent = favorites3.some(f => f.url === channel.url) ? '★' : '☆';
+                star3.onclick = (e) => { e.stopPropagation(); toggleFavorite(channel, 3); };
+
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = channel.name;
+
+                channelDiv.appendChild(star1);
+                channelDiv.appendChild(star2);
+                channelDiv.appendChild(star3);
+                channelDiv.appendChild(nameSpan);
 
                 if (!channel.redirect) {
                     channelDiv.addEventListener('mouseenter', () => {
@@ -273,15 +315,23 @@
                 return channelDiv;
             }
 
-            function toggleFavorite(channel) {
-                const index = favorites.findIndex(f => f.url === channel.url);
+            function toggleFavorite(channel, listNumber) {
+                const lists = [favorites1, favorites2, favorites3];
+                const currentList = lists[listNumber - 1];
+                const otherLists = lists.filter((_, i) => i !== listNumber - 1);
+
+                const index = currentList.findIndex(f => f.url === channel.url);
                 if (index === -1) {
-                    favorites.push(channel);
+                    currentList.push(channel);
+                    otherLists.forEach(list => {
+                        const otherIndex = list.findIndex(f => f.url === channel.url);
+                        if (otherIndex !== -1) list.splice(otherIndex, 1);
+                    });
                 } else {
-                    favorites.splice(index, 1);
+                    currentList.splice(index, 1);
                 }
                 updateFavorites();
-                generateChannels(); // Uppdatera kanallistan för att visa korrekta stjärnor
+                generateChannels();
             }
 
             function generateChannels() {
@@ -296,13 +346,11 @@
                     return;
                 }
 
-                // Rensa listorna innan vi fyller dem
                 newsList.innerHTML = '';
                 musicList.innerHTML = '';
                 entertainmentList.innerHTML = '';
                 kidsList.innerHTML = '';
 
-                // Generera kanaler för varje kategori
                 Object.keys(channels).forEach(category => {
                     console.log(`Bearbetar kategori: ${category}`);
                     const channelList = document.getElementById(`${category}Channels`);
@@ -339,7 +387,9 @@
                 mainPlayer.ready(function () {
                     mainPlayer.play().catch(error => {
                         console.error("Uppspelningsfel för " + url + ":", error);
-                        alert("Kunde inte spela upp strömmen. Det kan bero på CORS, en trasig länk eller serverproblem.");
+                        errorMessage.textContent = "Kunde inte spela upp strömmen. Kontrollera anslutning eller länk.";
+                        errorMessage.style.display = 'block';
+                        setTimeout(() => { errorMessage.style.display = 'none'; }, 3000); // Döljs efter 3 sekunder
                     });
                 });
             }
