@@ -15,11 +15,13 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
+            overflow: hidden;
         }
         .player-wrapper {
             position: relative;
             width: 800px;
             height: 450px;
+            z-index: 1;
         }
         .video-container {
             width: 100%;
@@ -28,12 +30,19 @@
         }
         .channel-circle {
             position: absolute;
-            width: 1000px;
-            height: 1000px;
+            width: 1200px;
+            height: 1200px;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
+            overflow: hidden;
+        }
+        .channel-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease;
         }
         .channel {
             position: absolute;
@@ -45,6 +54,7 @@
             pointer-events: all;
             text-align: center;
             font-size: 0.9em;
+            white-space: nowrap;
         }
         .channel:hover {
             background: #e50914;
@@ -69,7 +79,9 @@
                 <source src="" type="application/x-mpegURL">
             </video>
         </div>
-        <div class="channel-circle" id="channelCircle"></div>
+        <div class="channel-circle" id="channelCircle">
+            <div class="channel-ring" id="channelRing"></div>
+        </div>
     </div>
 
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
@@ -83,7 +95,7 @@
                 }
             });
             const videoContainer = document.querySelector('.video-container');
-            const channelCircle = document.getElementById('channelCircle');
+            const channelRing = document.getElementById('channelRing');
             let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
             function formatChannelName(url) {
@@ -92,32 +104,44 @@
             }
 
             const channels = [
-                // Alla kanaler samlade i en array istället för kategorier
                 { name: "Zagros", url: "https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8" },
                 { name: "Zoom", url: "https://live.zoomnews.info/live/Zoom_playlist.m3u8" },
                 { name: "Kanal8", url: "https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8" },
                 { name: "Rudaw", url: "https://svs.itworkscdn.net/rudawlive/rudawlive.smil/playlist.m3u8" },
+                { name: "Kurdsat News", url: "https://kurdsat-news.akamaized.net/hls/kurdsat-news.m3u8" },
+                { name: "Sterk", url: "https://muzkurd.com/sterktv/sterk/chunklist_w913361557.m3u8" },
+                { name: "NRT News", url: "https://media.streambrothers.com:1936/8226/8226/playlist.m3u8" },
+                { name: "Kurdistan24", url: "https://d1x82nydcxndze.cloudfront.net/live/index_720p25.m3u8" },
                 { name: "4 Kurd", url: "https://4kuhls.persiana.live/hls/stream.m3u8" },
                 { name: "Med Music", url: "http://54.36.110.140/live3/live3.m3u8" },
                 { name: "Aryen", url: "https://aryen.tv/live/tv/playlist.m3u8" },
                 { name: "Cira", url: "https://cira-tv.akamaized.net/hls/stream_0.m3u8" },
+                { name: "Waar", url: "https://live.kwikmotion.com/waarmedialive/waarmedia.smil/waarmediapublish/waarmedia_source/chunks.m3u8" },
+                { name: "Rojava", url: "https://rojava-tv.akamaized.net/hls/rojava-tv.m3u8" },
+                { name: "Kurdsat HD", url: "https://kurdsat.akamaized.net/hls/kurdsat.m3u8" },
+                { name: "Kurdistan TV", url: "https://5a3ed7a72ed4b.streamlock.net/live/SMIL:myStream.smil/playlist.m3u8" },
                 { name: "Baxche", url: "https://5dcabf026b188.streamlock.net/afarinTV/livestream/playlist.m3u8" },
-                // Lägg till fler kanaler här från din ursprungliga lista
+                { name: "Afarin Kids", url: "https://65f16f0fdfc51.streamlock.net/afarinTV/livestream/playlist.m3u8" },
+                { name: "Zarok Kurmanci", url: "https://zindikurmanci.zaroktv.com.tr/hls/0/stream.m3u8" },
+                { name: "Zarok Sorani", url: "https://zindisorani.zaroktv.com.tr/hls/stream.m3u8" },
+                // Lägg till fler kanaler från din ursprungliga lista här
             ];
 
             function generateChannelCircle() {
-                const radius = 500; // Radien för cirkeln
+                const radius = 600; // Ökad radie för att rymma fler kanaler
                 const totalChannels = channels.length;
+                const angleStep = (2 * Math.PI) / totalChannels;
+
                 channels.forEach((channel, index) => {
-                    const angle = (index / totalChannels) * 2 * Math.PI;
+                    const angle = index * angleStep;
                     const x = Math.cos(angle) * radius;
                     const y = Math.sin(angle) * radius;
 
                     const channelDiv = document.createElement('div');
                     channelDiv.className = 'channel';
                     channelDiv.textContent = channel.name;
-                    channelDiv.style.left = `calc(50% + ${x}px - 50px)`;
-                    channelDiv.style.top = `calc(50% + ${y}px - 15px)`;
+                    channelDiv.style.left = `calc(50% + ${x}px - 60px)`; // Justera för bredd
+                    channelDiv.style.top = `calc(50% + ${y}px - 15px)`;  // Justera för höjd
 
                     if (favorites.includes(channel.name)) {
                         channelDiv.classList.add('favorite');
@@ -137,7 +161,7 @@
                         toggleFavorite(channel.name, channelDiv);
                     });
 
-                    channelCircle.appendChild(channelDiv);
+                    channelRing.appendChild(channelDiv);
                 });
             }
 
@@ -161,6 +185,13 @@
                     });
                 });
             }
+
+            // Mus-hjul för att rotera ringen
+            let rotation = 0;
+            document.addEventListener('wheel', (e) => {
+                rotation += e.deltaY * 0.1; // Rotationshastighet
+                channelRing.style.transform = `rotate(${rotation}deg)`;
+            });
 
             generateChannelCircle();
         });
