@@ -190,17 +190,24 @@
                 ],
                 entertainment: [
                     { name: "Aryen", url: "https://aryen.tv/live/tv/playlist.m3u8" },
-                    { name: "Cira", url:-
+                    { name: "Cira", url: "https://cira-tv.akamaized.net/hls/stream_0.m3u8" },
+                    { name: "Waar", url: "https://live.kwikmotion.com/waarmedialive/waarmedia.smil/waarmediapublish/waarmedia_source/chunks.m3u8" },
+                    { name: "Rojava", url: "https://rojava-tv.akamaized.net/hls/rojava-tv.m3u8" },
+                    { name: "Kurdsat HD", url: "https://kurdsat.akamaized.net/hls/kurdsat.m3u8" },
+                    { name: "Kurdistan TV", url: "https://5a3ed7a72ed4b.streamlock.net/live/SMIL:myStream.smil/playlist.m3u8" },
                     { name: "Bangewaz", url: "https://bangewaz.live/hls/stream.m3u8" },
                     { name: "Bangxwazen-badinan", url: "https://karwan.tv/bangxwazen-badinan-tv.html", redirect: true, newTab: true }
                 ],
                 kids: [
                     { name: "Baxche", url: "https://5dcabf026b188.streamlock.net/afarinTV/livestream/playlist.m3u8" },
-                    { name: "Afarin Kids", url: "https://65f16f0fdfc51.streamlock.net/afarinTV/livestream/playlist.m3u8" }
+                    { name: "Afarin Kids", url: "https://65f16f0fdfc51.streamlock.net/afarinTV/livestream/playlist.m3u8" },
+                    { name: "Zarok Kurmanci", url: "https://zindikurmanci.zaroktv.com.tr/hls/0/stream.m3u8" },
+                    { name: "Zarok Sorani", url: "https://zindisorani.zaroktv.com.tr/hls/stream.m3u8" }
                 ]
             };
 
             function updateFavorites() {
+                console.log("Uppdaterar favoriter...");
                 const favLists = {
                     list1: document.getElementById('favoritesList1'),
                     list2: document.getElementById('favoritesList2'),
@@ -213,11 +220,13 @@
                 Object.keys(favLists).forEach(list => {
                     favLists[list].innerHTML = '';
                     favorites[list].forEach(channel => {
+                        console.log(`Lägger till favoritkanal i ${list}: ${channel.name}`);
                         const channelDiv = createChannelElement(channel);
                         favLists[list].appendChild(channelDiv);
                     });
                 });
                 localStorage.setItem('favorites', JSON.stringify(favorites));
+                console.log("Favoriter uppdaterade.");
             }
 
             function createChannelElement(channel) {
@@ -262,6 +271,7 @@
             }
 
             function toggleFavorite(channel, listName) {
+                console.log(`Togglar favorit för ${channel.name} i ${listName}`);
                 ['list1', 'list2', 'list3'].forEach(list => {
                     const index = favorites[list].findIndex(f => f.url === channel.url);
                     if (index !== -1) favorites[list].splice(index, 1);
@@ -282,6 +292,7 @@
 
                 if (!newsList || !musicList || !entertainmentList || !kidsList) {
                     console.error("Ett eller flera kanallista-element saknas i DOM");
+                    console.log("newsList:", newsList, "musicList:", musicList, "entertainmentList:", entertainmentList, "kidsList:", kidsList);
                     return;
                 }
 
@@ -293,8 +304,12 @@
                 Object.keys(channels).forEach(category => {
                     console.log(`Bearbetar kategori: ${category}, antal kanaler: ${channels[category].length}`);
                     const channelList = document.getElementById(`${category}Channels`);
+                    if (!channelList) {
+                        console.error(`Kunde inte hitta element för ${category}Channels`);
+                        return;
+                    }
                     channels[category].forEach(channel => {
-                        console.log(`Lägger till kanal: ${channel.name}`);
+                        console.log(`Lägger till kanal: ${channel.name} i ${category}`);
                         const channelDiv = createChannelElement(channel);
                         channelList.appendChild(channelDiv);
                     });
@@ -334,6 +349,8 @@
                 });
             }
 
+            // Kör initieringen
+            console.log("Channels objekt:", channels); // Logga channels för att verifiera data
             try {
                 console.log("Försöker generera kanaler och uppdatera favoriter...");
                 generateChannels();
