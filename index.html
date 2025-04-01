@@ -1,4 +1,4 @@
-"<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
@@ -21,10 +21,16 @@
             max-width: 1200px; 
             margin: 0 auto; 
         }
-        .sidebar { 
+        .favorites-sidebar { 
             width: 200px; 
             overflow-y: auto; 
             padding-right: 20px; 
+        }
+        .channel-sidebar {
+            width: 200px;
+            order: 2;
+            overflow-y: auto;
+            padding-left: 20px;
         }
         h1 { 
             text-align: center; 
@@ -32,10 +38,10 @@
             margin-bottom: 20px; 
             color: #e50914; 
         }
-        .category { 
+        .category, .fav-category { 
             margin-bottom: 20px; 
         }
-        .category h2 { 
+        .category h2, .fav-category h2 { 
             font-size: 1.5em; 
             margin-bottom: 10px; 
             border-bottom: 2px solid #e50914; 
@@ -53,6 +59,9 @@
             cursor: pointer; 
             border-radius: 5px; 
             transition: background 0.3s; 
+            position: relative;
+            display: flex;
+            align-items: center;
         }
         .channel:hover { 
             background: #e50914; 
@@ -62,19 +71,56 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
+            order: 1;
         }
         .video-container { 
             width: 100%; 
             max-width: 800px; 
             margin: 20px 0; 
-            display: none; /* Dold som standard */
+            display: none;
+        }
+        .fav-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 5px;
+        }
+        .fav-btn:hover {
+            color: #e50914;
+        }
+        .channel-name {
+            flex: 1;
+            text-align: left;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <h1>Min Streamingsida</h1>
+        <div class="favorites-sidebar">
+            <div class="fav-category">
+                <h1>Favoritlista 1</h1>
+                <div id="favoritesList1" class="channel-list"></div>
+            </div>
+            <div class="fav-category">
+                <h1>Favoritlista 2</h1>
+                <div id="favoritesList2" class="channel-list"></div>
+            </div>
+            <div class="fav-category">
+                <h1>Favoritlista 3</h1>
+                <div id="favoritesList3" class="channel-list"></div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="video-container">
+                <video id="main-video" class="video-js vjs-default-skin" controls width="100%" height="450">
+                    <source src="" type="application/x-mpegURL">
+                </video>
+            </div>
+        </div>
+        <div class="channel-sidebar">
+            <h1>Kanallista</h1>
             <div id="categories">
                 <div class="category">
                     <h2>Nyheter</h2>
@@ -94,13 +140,6 @@
                 </div>
             </div>
         </div>
-        <div class="content">
-            <div class="video-container">
-                <video id="main-video" class="video-js vjs-default-skin" controls width="100%" height="450">
-                    <source src="" type="application/x-mpegURL">
-                </video>
-            </div>
-        </div>
     </div>
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
     <script>
@@ -116,6 +155,8 @@
             });
 
             const videoContainer = document.querySelector('.video-container');
+            let favorites = JSON.parse(localStorage.getItem('favorites')) || { list1: [], list2: [], list3: [] };
+            let shownErrors = new Set(); // För att spåra visade felmeddelanden, men används inte för alert längre
 
             function formatChannelName(url) {
                 const namePart = url.split('/').pop().replace('.html', '').replace(/-/g, ' ');
@@ -175,7 +216,7 @@
                     { name: "Ronahi", url: "https://ronahi-tv.akamaized.net/hls/stream_0.m3u8" },
                     { name: "Amozhgary", url: "https://app-live.org/live/3268334b/index.m3u8" },
                     { name: "Barin Quran", url: "https://karwan.tv/barin-quran.html", redirect: true, newTab: true },
-                    { name: "Bangewaz", url: "https://karwan.tv/bangawaz-tv.html", redirect: true, newTab: true },
+                    { name: "Bangewaz", url: "https://bangewaz.live/hls/stream.m3u8" },
                     { name: "Bangxwazen-badinan", url: "https://karwan.tv/bangxwazen-badinan-tv.html", redirect: true, newTab: true },
                     { name: formatChannelName("https://karwan.tv/mmn-quran-tv.html"), url: "https://karwan.tv/mmn-quran-tv.html", redirect: true, newTab: true },
                     { name: formatChannelName("https://karwan.tv/eman-tv.html"), url: "https://karwan.tv/eman-tv.html", redirect: true, newTab: true },
@@ -210,6 +251,77 @@
                 ]
             };
 
+            function updateFavorites() {
+                const favLists = {
+                    list1: document.getElementById('favoritesList1'),
+                    list2: document.getElementById('favoritesList2'),
+                    list3: document.getElementById('favoritesList3')
+                };
+                Object.keys(favLists).forEach(list => {
+                    favLists[list].innerHTML = '';
+                    favorites[list].forEach(channel => {
+                        const channelDiv = createChannelElement(channel);
+                        favLists[list].appendChild(channelDiv);
+                    });
+                });
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+            }
+
+            function createChannelElement(channel) {
+                const channelDiv = document.createElement('div');
+                channelDiv.className = 'channel';
+
+                const favBtn1 = document.createElement('button');
+                favBtn1.className = 'fav-btn';
+                favBtn1.textContent = favorites.list1.some(f => f.url === channel.url) ? '★' : '☆';
+                favBtn1.onclick = (e) => { e.stopPropagation(); toggleFavorite(channel, 'list1'); };
+
+                const favBtn2 = document.createElement('button');
+                favBtn2.className = 'fav-btn';
+                favBtn2.textContent = favorites.list2.some(f => f.url === channel.url) ? '★' : '☆';
+                favBtn2.onclick = (e) => { e.stopPropagation(); toggleFavorite(channel, 'list2'); };
+
+                const favBtn3 = document.createElement('button');
+                favBtn3.className = 'fav-btn';
+                favBtn3.textContent = favorites.list3.some(f => f.url === channel.url) ? '★' : '☆';
+                favBtn3.onclick = (e) => { e.stopPropagation(); toggleFavorite(channel, 'list3'); };
+
+                const channelName = document.createElement('span');
+                channelName.className = 'channel-name';
+                channelName.textContent = channel.name;
+
+                channelDiv.appendChild(favBtn1);
+                channelDiv.appendChild(favBtn2);
+                channelDiv.appendChild(favBtn3);
+                channelDiv.appendChild(channelName);
+
+                if (!channel.redirect) {
+                    channelDiv.addEventListener('mouseenter', () => {
+                        videoContainer.style.display = 'block';
+                        playStream(channel.url);
+                    });
+                    channelDiv.addEventListener('mouseleave', () => {
+                        mainPlayer.pause();
+                    });
+                }
+                channelDiv.addEventListener('click', () => handleChannelClick(channel));
+                return channelDiv;
+            }
+
+            function toggleFavorite(channel, listName) {
+                // Ta bort kanalen från alla listor först
+                ['list1', 'list2', 'list3'].forEach(list => {
+                    const index = favorites[list].findIndex(f => f.url === channel.url);
+                    if (index !== -1) favorites[list].splice(index, 1);
+                });
+                // Lägg till i den valda listan om stjärnan inte redan är fylld
+                if (!favorites[listName].some(f => f.url === channel.url)) {
+                    favorites[listName].push(channel);
+                }
+                updateFavorites();
+                generateChannels();
+            }
+
             function generateChannels() {
                 console.log("Genererar kanaler...");
                 const newsList = document.getElementById('newsChannels');
@@ -218,30 +330,22 @@
                 const kidsList = document.getElementById('kidsChannels');
 
                 if (!newsList || !musicList || !entertainmentList || !kidsList) {
-                    console.error("Ett eller flera element saknas");
+                    console.error("Ett eller flera element saknas i DOM");
                     return;
                 }
 
+                newsList.innerHTML = '';
+                musicList.innerHTML = '';
+                entertainmentList.innerHTML = '';
+                kidsList.innerHTML = '';
+
                 Object.keys(channels).forEach(category => {
+                    console.log(`Bearbetar kategori: ${category}`);
+                    const channelList = document.getElementById(`${category}Channels`);
                     channels[category].forEach(channel => {
-                        const channelDiv = document.createElement('div');
-                        channelDiv.className = 'channel';
-                        channelDiv.textContent = channel.name;
-
-                        // Hover: Spela upp i stora spelaren (bara för strömkanaler)
-                        if (!channel.redirect) {
-                            channelDiv.addEventListener('mouseenter', () => {
-                                videoContainer.style.display = 'block';
-                                playStream(channel.url);
-                            });
-
-                            channelDiv.addEventListener('mouseleave', () => {
-                                mainPlayer.pause();
-                            });
-                        }
-
-                        channelDiv.addEventListener('click', () => handleChannelClick(channel));
-                        document.getElementById(`${category}Channels`).appendChild(channelDiv);
+                        console.log(`Lägger till kanal: ${channel.name}`);
+                        const channelDiv = createChannelElement(channel);
+                        channelList.appendChild(channelDiv);
                     });
                 });
                 console.log("Kanallistan har genererats.");
@@ -253,7 +357,7 @@
                 mainPlayer.pause();
 
                 if (channel.redirect && channel.newTab) {
-                    console.log("Öppnar i riktigt popup-fönster: " + channel.url);
+                    console.log("Öppnar i nytt fönster: " + channel.url);
                     window.open(channel.url, channel.name, 'width=800,height=450,scrollbars=yes,resizable=yes');
                 } else {
                     console.log("Spelar upp ström: " + channel.url);
@@ -271,13 +375,14 @@
                 mainPlayer.ready(function () {
                     mainPlayer.play().catch(error => {
                         console.error("Uppspelningsfel för " + url + ":", error);
-                        alert("Kunde inte spela upp strömmen. Det kan bero på CORS, en trasig länk eller serverproblem.");
+                        // Ingen alert längre, bara konsolloggning
                     });
                 });
             }
 
             try {
                 generateChannels();
+                updateFavorites();
             } catch (error) {
                 console.error("Fel vid generering av kanaler:", error);
             }
