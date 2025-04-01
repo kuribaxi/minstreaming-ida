@@ -93,6 +93,7 @@
         .channel-name {
             flex: 1;
             text-align: left;
+            color: #fff; /* Säkerställer att texten är synlig */
         }
     </style>
 </head>
@@ -156,7 +157,6 @@
 
             const videoContainer = document.querySelector('.video-container');
             let favorites = JSON.parse(localStorage.getItem('favorites')) || { list1: [], list2: [], list3: [] };
-            let shownErrors = new Set(); // För att spåra visade felmeddelanden, men används inte för alert längre
 
             function formatChannelName(url) {
                 const namePart = url.split('/').pop().replace('.html', '').replace(/-/g, ' ');
@@ -288,7 +288,7 @@
 
                 const channelName = document.createElement('span');
                 channelName.className = 'channel-name';
-                channelName.textContent = channel.name;
+                channelName.textContent = channel.name || 'Unnamed Channel'; // Säkerställer att ett namn alltid visas
 
                 channelDiv.appendChild(favBtn1);
                 channelDiv.appendChild(favBtn2);
@@ -309,12 +309,10 @@
             }
 
             function toggleFavorite(channel, listName) {
-                // Ta bort kanalen från alla listor först
                 ['list1', 'list2', 'list3'].forEach(list => {
                     const index = favorites[list].findIndex(f => f.url === channel.url);
                     if (index !== -1) favorites[list].splice(index, 1);
                 });
-                // Lägg till i den valda listan om stjärnan inte redan är fylld
                 if (!favorites[listName].some(f => f.url === channel.url)) {
                     favorites[listName].push(channel);
                 }
@@ -323,7 +321,6 @@
             }
 
             function generateChannels() {
-                console.log("Genererar kanaler...");
                 const newsList = document.getElementById('newsChannels');
                 const musicList = document.getElementById('musicChannels');
                 const entertainmentList = document.getElementById('entertainmentChannels');
@@ -340,34 +337,27 @@
                 kidsList.innerHTML = '';
 
                 Object.keys(channels).forEach(category => {
-                    console.log(`Bearbetar kategori: ${category}`);
                     const channelList = document.getElementById(`${category}Channels`);
                     channels[category].forEach(channel => {
-                        console.log(`Lägger till kanal: ${channel.name}`);
                         const channelDiv = createChannelElement(channel);
                         channelList.appendChild(channelDiv);
                     });
                 });
-                console.log("Kanallistan har genererats.");
             }
 
             function handleChannelClick(channel) {
-                console.log("Klickade på kanal: " + channel.name);
                 videoContainer.style.display = 'none';
                 mainPlayer.pause();
 
                 if (channel.redirect && channel.newTab) {
-                    console.log("Öppnar i nytt fönster: " + channel.url);
                     window.open(channel.url, channel.name, 'width=800,height=450,scrollbars=yes,resizable=yes');
                 } else {
-                    console.log("Spelar upp ström: " + channel.url);
                     videoContainer.style.display = 'block';
                     playStream(channel.url);
                 }
             }
 
             function playStream(url) {
-                console.log("Försöker spela upp: " + url);
                 mainPlayer.src({
                     src: url,
                     type: 'application/x-mpegURL'
@@ -375,7 +365,6 @@
                 mainPlayer.ready(function () {
                     mainPlayer.play().catch(error => {
                         console.error("Uppspelningsfel för " + url + ":", error);
-                        // Ingen alert längre, bara konsolloggning
                     });
                 });
             }
