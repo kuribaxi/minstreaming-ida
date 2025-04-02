@@ -18,17 +18,11 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            position: relative;
         }
         .header {
             padding: 10px 0;
             background: #333;
             text-align: center;
-            position: absolute;
-            top: 0;
-            width: 100%;
-            z-index: 1010;
-            display: none; /* Dold som standard */
         }
         h1 {
             margin: 0;
@@ -41,11 +35,6 @@
             gap: 20px;
             padding: 10px 0;
             background: #222;
-            position: absolute;
-            top: 60px; /* Under header */
-            width: 100%;
-            z-index: 1010;
-            display: none; /* Dold som standard */
         }
         .category-tab {
             padding: 10px 20px;
@@ -64,10 +53,6 @@
             background: #333;
             white-space: nowrap;
             width: 100%;
-            position: absolute;
-            top: 110px; /* Under categories */
-            z-index: 1010;
-            display: none; /* Dold som standard */
         }
         .channel {
             display: inline-block;
@@ -89,13 +74,15 @@
             flex: 1;
             width: 100%;
             height: 100%;
+            display: none;
             position: relative;
+            background: #000;
         }
         #main-video {
             width: 100%;
             height: 100%;
         }
-        .fullscreen {
+        .fullscreen .video-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -103,6 +90,9 @@
             height: 100vh;
             z-index: 1000;
             display: block;
+        }
+        .fullscreen .header, .fullscreen .categories, .fullscreen .channel-list {
+            display: none;
         }
         .channel-overlay {
             position: absolute;
@@ -144,13 +134,12 @@
                     }
                 }
             });
+            const container = document.querySelector('.container');
             const videoContainer = document.querySelector('.video-container');
             const channelList = document.getElementById('channelList');
             const categoriesDiv = document.getElementById('categories');
-            const header = document.querySelector('.header');
             const channelOverlay = document.getElementById('channelOverlay');
             let overlayTimeout;
-            let hoverTimeout;
 
             function formatChannelName(url) {
                 const namePart = url.split('/').pop().replace('.html', '').replace(/-/g, ' ');
@@ -185,7 +174,7 @@
                     { name: "Cira", url: "https://cira-tv.akamaized.net/hls/stream_0.m3u8" },
                     { name: "Waar", url: "https://live.kwikmotion.com/waarmedialive/waarmedia.smil/waarmediapublish/waarmedia_source/chunks.m3u8" },
                     { name: "Rojava", url: "https://rojava-tv.akamaized.net/hls/rojava-tv.m3u8" },
-                    { name: "Kurdsat HD", url: "https://kurdsat.akamaized.net/hls/kurdsat.m3u8" },
+                    { name: "Kurdsat HD", url: "https://kurdsat.akamaized.net/hls/kurdsat‬‬m3u8" },
                     { name: "Kurdistan TV", url: "https://5a3ed7a72ed4b.streamlock.net/live/SMIL:myStream.smil/playlist.m3u8" },
                     { name: "PDKI", url: "https://iko-live.akamaized.net/kurdhd/master.m3u8" },
                     { name: "Komala", url: "https://live.tvkomala.com/live/komala/playlist.m3u8" },
@@ -281,7 +270,7 @@
                     videoContainer.style.display = 'none';
                 } else {
                     playStream(channel.url);
-                    videoContainer.classList.add('fullscreen');
+                    container.classList.add('fullscreen');
                     channelOverlay.textContent = channel.name;
                     channelOverlay.style.display = 'block';
                     clearTimeout(overlayTimeout);
@@ -297,55 +286,27 @@
                     console.error("Uppspelningsfel:", error);
                     alert("Kunde inte spela upp strömmen.");
                     videoContainer.style.display = 'none';
+                    container.classList.remove('fullscreen');
                 });
             }
 
-            function showControls() {
-                header.style.display = 'block';
-                categoriesDiv.style.display = 'flex';
-                channelList.style.display = 'flex';
-            }
-
-            function hideControls() {
-                header.style.display = 'none';
-                categoriesDiv.style.display = 'none';
-                channelList.style.display = 'none';
-            }
-
-            videoContainer.addEventListener('mouseenter', () => {
-                clearTimeout(hoverTimeout);
-                hoverTimeout = setTimeout(() => {
-                    if (videoContainer.classList.contains('fullscreen')) {
-                        showControls();
-                    }
-                }, 5000); // 5 sekunder
-            });
-
-            videoContainer.addEventListener('mouseleave', () => {
-                clearTimeout(hoverTimeout);
-                hideControls();
-            });
-
-            videoContainer.addEventListener('mousemove', () => {
-                if (videoContainer.classList.contains('fullscreen')) {
-                    clearTimeout(hoverTimeout);
-                    hoverTimeout = setTimeout(() => {
-                        showControls();
-                    }, 5000);
-                }
-            });
-
             mainPlayer.on('fullscreenchange', () => {
-                if (!document.fullscreenElement && !videoContainer.classList.contains('fullscreen')) {
-                    videoContainer.classList.remove('fullscreen');
+                if (!document.fullscreenElement) {
+                    container.classList.remove('fullscreen');
                     videoContainer.style.display = 'none';
                     mainPlayer.pause();
-                    hideControls();
                 }
             });
 
-            // Visa kontroller initialt innan en kanal väljs
-            showControls();
+            // Lyssna på klick utanför helskärm för att stänga videon
+            document.addEventListener('click', (e) => {
+                if (container.classList.contains('fullscreen') && !videoContainer.contains(e.target) && !channelList.contains(e.target)) {
+                    container.classList.remove('fullscreen');
+                    videoContainer.style.display = 'none';
+                    mainPlayer.pause();
+                }
+            });
+
             generateCategories();
         });
     </script>
