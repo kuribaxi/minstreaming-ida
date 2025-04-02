@@ -137,4 +137,114 @@
             let overlayTimeout;
 
             function formatChannelName(url) {
-                const namePart = url.split('/').pop().replace('.html', '').
+                const namePart = url.split('/').pop().replace('.html', '').replace(/-/g, ' ');
+                return namePart.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            }
+
+            const channels = {
+                news: [
+                    { name: "Zagros", url: "https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8" },
+                    { name: "Zoom", url: "https://live.zoomnews.info/live/Zoom_playlist.m3u8" },
+                    { name: "Kanal8", url: "https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8" }
+                ],
+                music: [
+                    { name: "4 Kurd", url: "https://4kuhls.persiana.live/hls/stream.m3u8" },
+                    { name: "Med Music", url: "http://54.36.110.140/live3/live3.m3u8" }
+                ],
+                entertainment: [
+                    { name: "Aryen", url: "https://aryen.tv/live/tv/playlist.m3u8" },
+                    { name: "Cira", url: "https://cira-tv.akamaized.net/hls/stream_0.m3u8" }
+                ],
+                kids: [
+                    { name: "Baxche", url: "https://5dcabf026b188.streamlock.net/afarinTV/livestream/playlist.m3u8" },
+                    { name: "Afarin Kids", url: "https://65f16f0fdfc51.streamlock.net/afarinTV/livestream/playlist.m3u8" }
+                ]
+            };
+
+            function generateCategories() {
+                Object.keys(channels).forEach((category, index) => {
+                    const tab = document.createElement('div');
+                    tab.className = 'category-tab';
+                    tab.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                    tab.dataset.category = category;
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        generateChannels(category);
+                    });
+                    categoriesDiv.appendChild(tab);
+                    if (index === 0) {
+                        tab.classList.add('active');
+                        generateChannels(category);
+                    }
+                });
+            }
+
+            function generateChannels(category) {
+                channelList.innerHTML = '';
+                channels[category].forEach(channel => {
+                    const channelDiv = document.createElement('div');
+                    channelDiv.className = 'channel';
+                    channelDiv.textContent = channel.name;
+
+                    if (!channel.redirect) {
+                        channelDiv.addEventListener('mouseenter', () => {
+                            videoContainer.classList.add('fullscreen');
+                            channelOverlay.textContent = channel.name;
+                            channelOverlay.style.display = 'block';
+                            playStream(channel.url);
+                            clearTimeout(overlayTimeout);
+                            overlayTimeout = setTimeout(() => {
+                                channelOverlay.style.display = 'none';
+                            }, 10000); // Försvinner efter 10 sekunder
+                        });
+                        channelDiv.addEventListener('mouseleave', () => {
+                            videoContainer.classList.remove('fullscreen');
+                            mainPlayer.pause();
+                            channelOverlay.style.display = 'none';
+                            clearTimeout(overlayTimeout);
+                        });
+                    }
+
+                    channelDiv.addEventListener('click', () => handleChannelClick(channel));
+                    channelList.appendChild(channelDiv);
+                });
+            }
+
+            function handleChannelClick(channel) {
+                if (channel.redirect && channel.newTab) {
+                    window.open(channel.url, channel.name, 'width=800,height=450,scrollbars=yes,resizable=yes');
+                } else {
+                    videoContainer.classList.add('fullscreen');
+                    channelOverlay.textContent = channel.name;
+                    channelOverlay.style.display = 'block';
+                    playStream(channel.url);
+                    clearTimeout(overlayTimeout);
+                    overlayTimeout = setTimeout(() => {
+                        channelOverlay.style.display = 'none';
+                    }, 10000);
+                }
+            }
+
+            function playStream(url) {
+                mainPlayer.src({
+                    src: url,
+                    type: 'application/x-mpegURL'
+                });
+                mainPlayer.ready(function () {
+                    mainPlayer.play().catch(error => {
+                        console.error("Uppspelningsfel för " + url + ":", error);
+                        // Ingen alert längre, bara konsolloggning
+                    });
+                });
+            }
+
+            try {
+                generateCategories();
+            } catch (error) {
+                console.error("Fel vid generering av kategorier:", error);
+            }
+        });
+    </script>
+</body>
+</html>
